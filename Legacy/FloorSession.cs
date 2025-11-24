@@ -1,36 +1,44 @@
 ﻿using static Legacy.GameSession;
 using Legacy.Enemies;
 using Legacy.Music;
+using Legacy.Weapons;
+using Legacy.Items;
 
 namespace Legacy
 {
     public class FloorSession
     {
         public static List<Enemy> Enemies = new List<Enemy>();
+        public static List<Weapon> Weapons = new List<Weapon>();
+        public static List<Chest> Chests = new List<Chest>();
+
         public bool FloorIsRunning = true;
         public bool StartFloor()
         {
             MapGen.GenerateMap(Level, Location);
             DrawMap();
-            MusicPlayer.Location(Location);
             
             Enemies = MapGen.Enemies;
+            Weapons = MapGen.Weapons;
+            Chests = MapGen.Chests;
 
             while (FloorIsRunning)
             {
                 if (GameSession.Hero.Health <= 0)
                 {
-                    MusicPlayer.Stop();
+                    
                     return false;
                 }
 
                 HeroMove();
+                Thread.Sleep(10);
                 EnemiesMove();
 
-                Console.Write($"                                                        HP:{GameSession.Hero.Health}        \r");
+                Console.Write($"            Оружие: {GameSession.Hero.EquipedWeapon.Name}                           Ошеломление:{GameSession.Hero.Stagger}                    HP:{GameSession.Hero.Health}  Золото: {GameSession.Hero.Gold}       \r");
                 
             }
-            MusicPlayer.Stop();
+            
+            
             return true;
 
         }
@@ -44,6 +52,11 @@ namespace Legacy
 
         public static void HeroMove()
         {
+            
+            ConsoleKeyInfo key = default;
+            while (Console.KeyAvailable)
+                key = Console.ReadKey(true);
+
             var userInput = Console.ReadKey(true).Key;
             switch (userInput)
             {
@@ -77,7 +90,11 @@ namespace Legacy
                 {
                     if (Map[i, j] == '|' && Location == Locations.Castle)
                         Console.ForegroundColor = ConsoleColor.Gray;
-                    if (Map[i, j] == 'I')
+                    if (Map[i, j] == '&')
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    if (Map[i,j] == '!')
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                    if (Map[i, j] == '#')
                         Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write(Map[i, j]);
 

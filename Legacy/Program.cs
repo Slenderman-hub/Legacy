@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using Items;
-using Legacy;
+﻿using Legacy;
 class Program
 {
     static void Main()

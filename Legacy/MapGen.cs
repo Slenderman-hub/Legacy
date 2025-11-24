@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Legacy.Items;
 using Legacy.Enemies;
+using Legacy.LocationGens;
+using Legacy.Weapons;
 using static Legacy.GameSession;
-using  Legacy.LocationGens;
 
 namespace Legacy
 {
     public static class MapGen
     {
         public static List<Enemy> Enemies = new List<Enemy>();
+        public static List<Weapon> Weapons = new List<Weapon>();
+        public static List<Chest> Chests = new List<Chest>();
+
         static int Level;
         public static void GenerateMap(int level, Locations location)
         {

@@ -2,10 +2,13 @@
 
 namespace Legacy.Weapons
 {
-    public class Weapon(string name, int damage)
+    public class Weapon(string name, decimal damage)
     {
+        public char Icon { get; protected set; } = '!';
+        public (int x, int y) Pos;
         public string Name { get; protected set; } = name;
         public string Description { get; protected set; } = string.Empty;
-        public int Damage { get; set; } = damage;
+        public string Special { get; protected set; } = string.Empty;
+        public decimal Damage { get; set; } = damage;
     }
 }

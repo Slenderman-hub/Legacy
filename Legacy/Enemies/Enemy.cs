@@ -1,10 +1,15 @@
 ﻿using static Legacy.GameSession;
 using static Legacy.FloorSession;
+using  Legacy.Items;
+using Legacy.Weapons;
 
 namespace Legacy.Enemies
 {
     public class Enemy
     {
+        public List<Item> LootItems = new List<Item>(0);
+        public List<Weapon> LootWeapons = new List<Weapon>(0);
+
         public int Stagger = 0;
         public (int x, int y) Pos;
         public char Icon = ' ';
@@ -12,15 +17,17 @@ namespace Legacy.Enemies
         public string Description = string.Empty;
         public decimal Health;
         public decimal Damage;
+
+        public string Type = string.Empty;
         public Enemy(int x, int y)
         {
             Pos = (x, y);
         }
         public virtual void Action(Actions action)
         {
-            if (Stagger < 0)
+            if (Stagger > 0)
             {
-                Stagger++;
+                Stagger -= 2;
                 return;
             }
             switch (action)
@@ -37,11 +44,10 @@ namespace Legacy.Enemies
                                 break;
                             case '|':
                                 break;
-                            case 'I':
+                            case '&':
                                 Attack(GameSession.Hero);
                                 break;
                             default:
-                                
                                 break;
                         }
                     }
@@ -58,7 +64,7 @@ namespace Legacy.Enemies
                                 break;
                             case '|':
                                 break;
-                            case 'I':
+                            case '&':
                                 Attack(GameSession.Hero);
                                 break;
                             default:
@@ -78,7 +84,7 @@ namespace Legacy.Enemies
                                 break;
                             case '|':
                                 break;
-                            case 'I':
+                            case '&':
                                 Attack(GameSession.Hero);
                                 break;
                             default:
@@ -99,7 +105,7 @@ namespace Legacy.Enemies
                                 break;
                             case '|':
                                 break;
-                            case 'I':
+                            case '&':
                                 Attack(GameSession.Hero);
                                 break;
                             default:
@@ -120,6 +126,14 @@ namespace Legacy.Enemies
             {
                WriteNewPosition('X', (hero.Pos.x, hero.Pos.y),ConsoleColor.Red);
             }
+        }
+
+        public virtual void OnDeath()
+        {
+            foreach (Item item in LootItems)
+                GameSession.Hero.HeroInventory.Items.Add(item);
+            foreach (Weapon item in LootWeapons)
+                GameSession.Hero.HeroInventory.Weapons.Add(item);
         }
     }
     
