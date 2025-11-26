@@ -12,8 +12,8 @@ namespace Legacy.Enemies
             Description = "Хищное растение, что любит поживится искателями сокровищ, прикидываясь сундуком";
             Type = "Растение";
             Health = 50;
-            Damage = 5;
-            Stagger = 1;
+            Damage = 10;
+            Stagger = 0;
         }
         protected override void Attack(Hero hero)
         {
@@ -22,8 +22,13 @@ namespace Legacy.Enemies
                 this.LootWeapons.Add(hero.EquipedWeapon);
                 hero.HeroInventory.Weapons.Remove(hero.EquipedWeapon);
                 hero.EquipedWeapon = hero.HeroInventory.Weapons[0];
+
             }
-            hero.Health -= Damage;
+            else
+            {
+                hero.Health -= Damage;
+            }
+
             if (hero.Health <= 0)
             {
                 FloorSession.WriteNewPosition('X', (hero.Pos.x, hero.Pos.y), ConsoleColor.Red);

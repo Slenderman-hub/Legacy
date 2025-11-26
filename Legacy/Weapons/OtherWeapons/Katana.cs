@@ -1,12 +1,15 @@
 ﻿using Legacy;
 using Legacy.Enemies;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Legacy.Weapons.OtherWeapons
 {
     public class Katana : Weapon, IPostSpecial
     {
-        public Katana() : base("Катана", 6.66m)
+        public Katana() 
         {
+            Name = "Катана";
+            Damage = 6.66m;
             Description = "Только настоящий самурай может совладать с отвественностью, что несет этот клинок";
             Special = "Прорубает противника насквозь, тем самым меняя вас местами. Накладывает герою [4] ошеломления, после использования";
 

@@ -5,8 +5,10 @@ namespace Legacy.Weapons.OtherWeapons
 {
     public class MonsterWeapon : Weapon , IPreSpecial
     {
-        public MonsterWeapon(decimal damage) : base("Чудовищное оружие", damage)
+        public MonsterWeapon(decimal damage) 
         {
+            Name = "Чудовищное оружие";
+            Damage = damage;
             Description = "Вам настолько понравилось оружие противника, что вы решили его прихватить? Похвально";
             Special = "Очень воняет";
         }

@@ -5,14 +5,12 @@ using Legacy.Weapons;
 
 namespace Legacy.Enemies
 {
-    public class Enemy
+    public class Enemy : MapEntity
     {
         public List<Item> LootItems = new List<Item>(0);
         public List<Weapon> LootWeapons = new List<Weapon>(0);
 
         public int Stagger = 0;
-        public (int x, int y) Pos;
-        public char Icon = ' ';
         public string Name = string.Empty;
         public string Description = string.Empty;
         public decimal Health;
@@ -34,84 +32,39 @@ namespace Legacy.Enemies
             {
                 case Actions.Up:
                     if (Pos.y - 1 >= 1)
-                    {
-                        switch (Map[Pos.y - 1, Pos.x])
-                        {
-                            case ' ':
-                                WriteNewPosition(' ', (Pos.x, Pos.y));
-                                Pos.y -= 1;
-                                WriteNewPosition(Icon, (Pos.x, Pos.y));
-                                break;
-                            case '|':
-                                break;
-                            case '&':
-                                Attack(GameSession.Hero);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                        HandleNextTile(Pos.x, Pos.y - 1);
                     break;
                 case Actions.Down:
                     if (Pos.y + 1 < HEIGHT - 1)
-                    {
-                        switch (Map[Pos.y + 1, Pos.x])
-                        {
-                            case ' ':
-                                WriteNewPosition(' ', (Pos.x, Pos.y));
-                                Pos.y += 1;
-                                WriteNewPosition(Icon, (Pos.x, Pos.y));
-                                break;
-                            case '|':
-                                break;
-                            case '&':
-                                Attack(GameSession.Hero);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                        HandleNextTile(Pos.x, Pos.y + 1);
                     break;
                 case Actions.Left:
                     if (Pos.x - 1 >= 1)
-                    {
-                        switch (Map[Pos.y, Pos.x - 1])
-                        {
-                            case ' ':
-                                WriteNewPosition(' ', (Pos.x, Pos.y));
-                                Pos.x -= 1;
-                                WriteNewPosition(Icon, (Pos.x, Pos.y));
-                                break;
-                            case '|':
-                                break;
-                            case '&':
-                                Attack(GameSession.Hero);
-                                break;
-                            default:
-                                break;
-                        }
-
-                    }
+                        HandleNextTile(Pos.x-1, Pos.y);
                     break;
                 case Actions.Right:
                     if (Pos.x + 1 < WIDTH)
-                    {
-                        switch (Map[Pos.y, Pos.x + 1])
-                        {
-                            case ' ':
-                                WriteNewPosition(' ', (Pos.x, Pos.y));
-                                Pos.x += 1;
-                                WriteNewPosition(Icon, (Pos.x, Pos.y));
-                                break;
-                            case '|':
-                                break;
-                            case '&':
-                                Attack(GameSession.Hero);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                        HandleNextTile(Pos.x + 1, Pos.y);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        protected virtual void HandleNextTile(int x, int y)
+        {
+            var next = (x, y);
+            switch (Map[y, x])
+            {
+                case ' ':
+                    WriteNewPosition(' ', (Pos.x, Pos.y));
+                    Pos = next;
+                    WriteNewPosition(Icon, (Pos.x, Pos.y));
+                    break;
+                case '|':
+                    break;
+                case '&':
+                    Attack(GameSession.Hero);
                     break;
                 default:
                     break;

@@ -1,27 +1,21 @@
-﻿using static Legacy.GameSession;
-using Legacy.Enemies;
+﻿using Legacy.Enemies;
+using Legacy.Items;
 using Legacy.Music;
 using Legacy.Weapons;
-using Legacy.Items;
+using System;
+using static Legacy.GameSession;
 
 namespace Legacy
 {
     public class FloorSession
     {
-        public static List<Enemy> Enemies = new List<Enemy>();
-        public static List<Weapon> Weapons = new List<Weapon>();
-        public static List<Chest> Chests = new List<Chest>();
+        public static List<MapEntity> Entities = new List<MapEntity>();
 
-        public bool FloorIsRunning = true;
+        public static bool FloorIsRunning = true;
         public bool StartFloor()
         {
-            MapGen.GenerateMap(Level, Location);
-            DrawMap();
-            
-            Enemies = MapGen.Enemies;
-            Weapons = MapGen.Weapons;
-            Chests = MapGen.Chests;
-
+            MapGen.GenerateMap();
+            DrawMap();          
             while (FloorIsRunning)
             {
                 if (GameSession.Hero.Health <= 0)
@@ -30,9 +24,9 @@ namespace Legacy
                     return false;
                 }
 
-                HeroMove();
                 Thread.Sleep(10);
                 EnemiesMove();
+                HeroMove();
 
                 Console.Write($"            Оружие: {GameSession.Hero.EquipedWeapon.Name}                           Ошеломление:{GameSession.Hero.Stagger}                    HP:{GameSession.Hero.Health}  Золото: {GameSession.Hero.Gold}       \r");
                 
@@ -45,14 +39,17 @@ namespace Legacy
 
         private void EnemiesMove()
         {
-            foreach (var enemy in Enemies)
-                enemy.Action((Actions)Random.Shared.Next(1, 5));
-
+                foreach (var entity in Entities)
+                {
+                    if(entity is Enemy enemy)
+                        enemy.Action((Actions)Random.Shared.Next(1, 5));
+                }
         }
 
         public static void HeroMove()
         {
-            
+            if (GameSession.Hero.Health <= 0)
+                return;
             ConsoleKeyInfo key = default;
             while (Console.KeyAvailable)
                 key = Console.ReadKey(true);

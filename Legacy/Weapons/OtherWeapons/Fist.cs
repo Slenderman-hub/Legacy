@@ -4,8 +4,10 @@ namespace Legacy.Weapons
 {
     public class Fist : Weapon , IPostSpecial
     {
-        public Fist() : base("Кулак", 1)
+        public Fist() 
         {
+            Name = "Кулак";
+            Damage = 1;
             Description = "Все проблемы можно решить кулаками";
             Special = "Лечит на [2] здоровья, после убийства противника";
 

@@ -9,8 +9,10 @@ namespace Legacy.Weapons.OtherWeapons
 {
     public class Oathbladec : Weapon, IPostSpecial
     {
-        public Oathbladec() : base("Клятвенный клинок", 4.5m)
+        public Oathbladec() 
         {
+            Name = "Клятвенный клинок";
+            Damage = 4.5m;
             Description = "Твоя смерть повязана судьбою";
             Special = "После убийства противника СЛУЧАЙНО определитсься одно из следующих событий: 1)Герой получит [+10] к максимальному здоровью 2) Вы будете ранены на [10] урона";
         }

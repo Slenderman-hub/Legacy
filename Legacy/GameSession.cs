@@ -2,9 +2,14 @@
 
 namespace Legacy
 {
+    public class MapEntity
+    {
+        public char Icon { get; protected set; }
+        public (int x, int y) Pos { get; set; }
+    }
     public static class GameSession
     {
-        public const int WIDTH = 100; // Должно делиться на 4, для корректности отображения интерфейса
+        public const int WIDTH = 100; 
         public const int HEIGHT = 50; 
         public static bool GameIsRunning { get; set; } = false;
 

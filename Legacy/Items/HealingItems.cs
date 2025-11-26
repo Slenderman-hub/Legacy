@@ -1,10 +1,4 @@
 ﻿using Legacy.Enemies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Legacy.Items
 {
     public class HealingPotion : Item , IUseOnEnemy, IUseOnHero

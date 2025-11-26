@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Legacy;
+﻿using Legacy;
+using Legacy.Enemies;
 namespace Legacy.Items
 {
-    public class Chest
+    public class Chest : MapEntity
     {
-        public char Icon { get; protected set; } = '#';
-        public (int x, int y) Pos;
+        public Chest()
+        {
+            Icon = '#';
+        }
         public virtual bool Open()
         {
             var result = Random.Shared.Next(1, 101);
             if (result == 100)
             {
                 FloorSession.WriteNewPosition('M', Pos);
+                FloorSession.Entities.Add(new Mimic(Pos.x,Pos.y));
                 return false;
             }
 

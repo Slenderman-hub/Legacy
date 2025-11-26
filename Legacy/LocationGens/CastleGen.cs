@@ -1,27 +1,27 @@
-﻿using Legacy;
-using Legacy.Enemies;
+﻿using Legacy.Enemies;
 using Legacy.Items;
 using Legacy.Weapons;
 using Legacy.Weapons.OtherWeapons;
 using static Legacy.GameSession;
+using static Legacy.FloorSession;
 using static Legacy.MapGen;
 
 
 namespace Legacy.LocationGens
 {
-    static class CastleGen
+    static class CastleGen 
     {
-        public static List<(int x, int y)> FreeCells = new List<(int x, int y)>();
-        public static void InitializeCastle(int level)
+        
+        public static void InitializeCastle()
         {
-            Stack<(int x, int y)> stack = new Stack<(int x, int y)>();
-            int startX = 1;
-            int startY = 1;
+            FloorSession.Entities = new List<MapEntity>();
 
-            Map[startY, startX] = '&';
+            Stack<(int x, int y)> stack = new Stack<(int x, int y)>();
+
+            Map[1, 1] = '&';
+            stack.Push((1, 1));
 
             var DeadEnds = new HashSet<(int x, int y)>();
-            stack.Push((startX, startY));
 
             while (stack.Count > 0)
             {
@@ -50,12 +50,12 @@ namespace Legacy.LocationGens
                 }
             }
             FreeCells = DeadEnds.ToList();
-            InitializeEnemies(level);
-            InitializeWeapons(level);
-            InitializeСhests(level);
+            InitializeEnemies();
+            InitializeWeapons();
+            InitializeСhests();
             
         }
-        private static void InitializeСhests(int lvl)
+        private static void InitializeСhests()
         {
             int i = 0;
             while (i != HEIGHT)
@@ -67,13 +67,13 @@ namespace Legacy.LocationGens
                 {
                         var gs = new Chest() { Pos = spawn };
                         Map[spawn.y, spawn.x] = gs.Icon;
-                        Chests.Add(gs);
+                        Entities.Add(gs);
                 }
             }
         }
-        private static void InitializeWeapons(int lvl)
+        private static void InitializeWeapons()
         {
-            int lvlMod = lvl % 10;
+            int lvlMod = Level % 10;
             int i = 0;
             while(i != 2)
             {
@@ -89,22 +89,22 @@ namespace Legacy.LocationGens
                         case 1:
                             var cs = new ClericStaff() { Pos = spawn };
                             Map[spawn.y, spawn.x] = cs.Icon;
-                            MapGen.Weapons.Add(cs);
+                            Entities.Add(cs);
                             break;
                         case 2:
                             var c = new Claymore() { Pos = spawn };
                             Map[spawn.y, spawn.x] = c.Icon;
-                            MapGen.Weapons.Add(c);
+                            Entities.Add(c);
                             break;
                         case 3:
                             var k = new Katana() { Pos = spawn};
                             Map[spawn.y, spawn.x] = k.Icon;
-                            MapGen.Weapons.Add(k);
+                            Entities.Add(k);
                             break;
                         case 4:
                             var ob = new Oathbladec() { Pos = spawn };
                             Map[spawn.y, spawn.x] = ob.Icon;
-                            MapGen.Weapons.Add(ob);
+                            Entities.Add(ob);
                             break;
                         case 5:
                         case 6:
@@ -118,9 +118,9 @@ namespace Legacy.LocationGens
             }
 
         }
-        private static void InitializeEnemies(int lvl)
+        private static void InitializeEnemies()
         {
-            int lvlMod = lvl == 13 ? 2 : lvl % 10;
+            int lvlMod = Level == 13 ? 2 : Level % 10;
             int i = 0;
             while (i != HEIGHT * lvlMod)
             {
@@ -134,7 +134,7 @@ namespace Legacy.LocationGens
                         case 0:
                             var knight = new Knight(spawn.x, spawn.y);
                             Map[spawn.y, spawn.x] = knight.Icon;
-                            MapGen.Enemies.Add(knight);
+                            Entities.Add(knight);
                             break;
                         default:
                             break;
