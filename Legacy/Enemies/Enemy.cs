@@ -20,6 +20,7 @@ namespace Legacy.Enemies
         public Enemy(int x, int y)
         {
             Pos = (x, y);
+            IconColor = ConsoleColor.White;
         }
         public virtual void Action(Actions action)
         {
@@ -35,7 +36,7 @@ namespace Legacy.Enemies
                         HandleNextTile(Pos.x, Pos.y - 1);
                     break;
                 case Actions.Down:
-                    if (Pos.y + 1 < HEIGHT - 1)
+                    if (Pos.y + 1 < MAP_HEIGHT - 1)
                         HandleNextTile(Pos.x, Pos.y + 1);
                     break;
                 case Actions.Left:
@@ -43,7 +44,7 @@ namespace Legacy.Enemies
                         HandleNextTile(Pos.x-1, Pos.y);
                     break;
                 case Actions.Right:
-                    if (Pos.x + 1 < WIDTH)
+                    if (Pos.x + 1 < MAP_WIDTH)
                         HandleNextTile(Pos.x + 1, Pos.y);
                     break;
                 default:
@@ -59,7 +60,7 @@ namespace Legacy.Enemies
                 case ' ':
                     WriteNewPosition(' ', (Pos.x, Pos.y));
                     Pos = next;
-                    WriteNewPosition(Icon, (Pos.x, Pos.y));
+                    WriteNewPosition(Icon, (Pos.x, Pos.y), IconColor);
                     break;
                 case '|':
                     break;
@@ -71,7 +72,7 @@ namespace Legacy.Enemies
             }
         }
 
-        protected virtual void Attack(Hero hero)
+        public virtual void Attack(Hero hero)
         {
             hero.Health -= Damage;
             hero.Stagger += 1;

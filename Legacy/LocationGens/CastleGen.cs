@@ -1,7 +1,7 @@
 ﻿using Legacy.Enemies;
 using Legacy.Items;
 using Legacy.Weapons;
-using Legacy.Weapons.OtherWeapons;
+using Legacy.Weapons;
 using static Legacy.GameSession;
 using static Legacy.FloorSession;
 using static Legacy.MapGen;
@@ -14,7 +14,7 @@ namespace Legacy.LocationGens
         
         public static void InitializeCastle()
         {
-            FloorSession.Entities = new List<MapEntity>();
+            Entities = new List<MapEntity>();
 
             Stack<(int x, int y)> stack = new Stack<(int x, int y)>();
 
@@ -50,6 +50,7 @@ namespace Legacy.LocationGens
                 }
             }
             FreeCells = DeadEnds.ToList();
+            InitializePortals();
             InitializeEnemies();
             InitializeWeapons();
             InitializeСhests();
@@ -58,7 +59,7 @@ namespace Legacy.LocationGens
         private static void InitializeСhests()
         {
             int i = 0;
-            while (i != HEIGHT)
+            while (i != MAP_HEIGHT)
             {
                 i++;
                 var spawn = FreeCells[Random.Shared.Next(FreeCells.Count)];
@@ -68,6 +69,25 @@ namespace Legacy.LocationGens
                         var gs = new Chest() { Pos = spawn };
                         Map[spawn.y, spawn.x] = gs.Icon;
                         Entities.Add(gs);
+                }
+            }
+        }
+        private static void InitializePortals()
+        {
+            int i = 0;
+            while (i != 1)
+            {
+                var spawn = FreeCells[Random.Shared.Next(FreeCells.Count)];
+                
+
+                if (spawn.x != 1 && spawn.y != 1)
+                {
+                    i++;
+                    FreeCells.Remove(spawn);
+                    var gs = new Portal(Location,Level++);
+                    gs.Pos = spawn;
+                    Map[spawn.y, spawn.x] = gs.Icon;
+                    Entities.Add(gs);
                 }
             }
         }
@@ -102,7 +122,7 @@ namespace Legacy.LocationGens
                             Entities.Add(k);
                             break;
                         case 4:
-                            var ob = new Oathbladec() { Pos = spawn };
+                            var ob = new Oathblade() { Pos = spawn };
                             Map[spawn.y, spawn.x] = ob.Icon;
                             Entities.Add(ob);
                             break;
@@ -122,10 +142,10 @@ namespace Legacy.LocationGens
         {
             int lvlMod = Level == 13 ? 2 : Level % 10;
             int i = 0;
-            while (i != HEIGHT * lvlMod)
+            while (i != MAP_HEIGHT * lvlMod)
             {
                 var spawn = FreeCells[Random.Shared.Next(FreeCells.Count)];
-                if (spawn.x >= WIDTH / 8 || spawn.y >= HEIGHT / 8)
+                if (spawn.x >= MAP_WIDTH / 8 || spawn.y >= MAP_HEIGHT / 8)
                 {
                     i++;
                     FreeCells.Remove(spawn);
@@ -148,11 +168,11 @@ namespace Legacy.LocationGens
             List<(int x, int y)> neighbors = new List<(int x, int y)>();
             if (x - 2 >= 1 && Map[y, x - 2] == '|')
                 neighbors.Add((x - 2, y));
-            if (x + 2 < WIDTH - 1 && Map[y, x + 2] == '|')
+            if (x + 2 < MAP_WIDTH - 1 && Map[y, x + 2] == '|')
                 neighbors.Add((x + 2, y));
             if (y - 2 >= 1 && Map[y - 2, x] == '|')
                 neighbors.Add((x, y - 2));
-            if (y + 2 < HEIGHT - 1 && Map[y + 2, x] == '|')
+            if (y + 2 < MAP_HEIGHT - 1 && Map[y + 2, x] == '|')
                 neighbors.Add((x, y + 2));
 
             return neighbors;

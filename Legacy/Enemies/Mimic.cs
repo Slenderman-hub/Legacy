@@ -9,13 +9,13 @@ namespace Legacy.Enemies
         {
             Icon = 'M';
             Name = "Мимик";
-            Description = "Хищное растение, что любит поживится искателями сокровищ, прикидываясь сундуком";
+            Description = "Хищное растение, что любит поживится искателями смерти, прикидываясь сундуком";
             Type = "Растение";
             Health = 50;
             Damage = 10;
             Stagger = 0;
         }
-        protected override void Attack(Hero hero)
+        public override void Attack(Hero hero)
         {
             if (hero.EquipedWeapon is not Fist)
             {
@@ -26,12 +26,7 @@ namespace Legacy.Enemies
             }
             else
             {
-                hero.Health -= Damage;
-            }
-
-            if (hero.Health <= 0)
-            {
-                FloorSession.WriteNewPosition('X', (hero.Pos.x, hero.Pos.y), ConsoleColor.Red);
+                base.Attack(hero);
             }
 
         }

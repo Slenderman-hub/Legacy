@@ -1,7 +1,7 @@
 ﻿
 using Legacy.Enemies;
 
-namespace Legacy.Weapons.OtherWeapons
+namespace Legacy.Weapons
 {
     public class MonsterWeapon : Weapon , IPreSpecial
     {

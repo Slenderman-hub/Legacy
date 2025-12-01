@@ -1,5 +1,5 @@
 ﻿using Legacy.Enemies;
-using Legacy.Weapons.OtherWeapons;
+using Legacy.Weapons;
 using System;
 using System.Collections.Generic;
 using System.Linq;

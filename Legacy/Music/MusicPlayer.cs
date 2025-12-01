@@ -1,38 +1,86 @@
-﻿using System.Media;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using NAudio.Wave;
+namespace Legacy.Music{
 
-namespace Legacy.Music
-{
-    static public class MusicPlayer
+
+    public static class MusicPlayer
     {
-        public static readonly string DIR_PATH = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\Music\\";
-        public static SoundPlayer Player;
-        public static void Location(GameSession.Locations location)
-        {
-            if (location is GameSession.Locations.Castle)
-                Play($"Castle{Random.Shared.Next(1, 3)}.wav");
+        private static WaveOutEvent _waveOut;
+        private static AudioFileReader _audioFile;
+        private static string _tempFilePath;
+        private static string _currentResourceName;
 
-            if (location is GameSession.Locations.Forest)
-                Play( $"Forest{Random.Shared.Next(1, 3)}.wav");
+        public static void Play(string resourceName = "")
+        {
+            if (resourceName == "")
+                resourceName = $"Floor{Random.Shared.Next(1, 6)}.mp3";
+
+            if (_waveOut != null)
+            {
+                _waveOut.PlaybackStopped -= OnPlaybackStopped;
+                _waveOut.Stop();
+                _waveOut.Dispose();
+                _waveOut = null;
+            }
+
+            _audioFile?.Dispose();
+            _audioFile = null;
+
+            if (File.Exists(_tempFilePath))
+            {
+                try { File.Delete(_tempFilePath); } catch { }
+            }
+
+            _currentResourceName = resourceName;
+            var assembly = Assembly.GetExecutingAssembly();
+            string fullResourceName = assembly.GetName().Name + ".Music." + resourceName;
+
+            var resourceStream = assembly.GetManifestResourceStream(fullResourceName);
+            _tempFilePath = Path.GetTempFileName() + Path.GetExtension(resourceName);
+
+            using (var fileStream = File.Create(_tempFilePath))
+            {
+                resourceStream.CopyTo(fileStream);
+            }
+            _audioFile = new AudioFileReader(_tempFilePath);
+            _waveOut = new WaveOutEvent();
+            _waveOut.Init(_audioFile);
+            _waveOut.PlaybackStopped += OnPlaybackStopped;
+            _waveOut.Play();
 
         }
-        public static void Boss(GameSession.Locations location)
-        {
-            if (location is GameSession.Locations.Castle)
-                Play("CastleBoss.wav");
-            if (location is GameSession.Locations.Forest)
-                Play("ForestBoss.wav");
-        }
-        public static void GameOver() => Play("GameOver.wav");
-        public static void Title() => Play("Title.wav");
 
-        public static void Stop()
+        private static void OnPlaybackStopped(object sender, StoppedEventArgs e)
         {
-            Player.Stop();
+            if (!string.IsNullOrEmpty(_currentResourceName))
+            {
+                _audioFile?.Dispose();
+                _waveOut?.Dispose();
+                if (!File.Exists(_tempFilePath))
+                {
+                    var assembly = Assembly.GetExecutingAssembly();
+                    string fullResourceName = assembly.GetName().Name + ".Music." + _currentResourceName;
+
+                    using (var resourceStream = assembly.GetManifestResourceStream(fullResourceName))
+                    {
+                        if (resourceStream != null)
+                        {
+                            using (var fileStream = File.Create(_tempFilePath))
+                            {
+                                resourceStream.CopyTo(fileStream);
+                            }
+                        }
+                    }
+                }
+
+                _audioFile = new AudioFileReader(_tempFilePath);
+                _waveOut = new WaveOutEvent();
+                _waveOut.Init(_audioFile);
+                _waveOut.PlaybackStopped += OnPlaybackStopped;
+                _waveOut.Play();
+            }
         }
-        public static void Play(string fileName)
-        {
-            Player = new SoundPlayer(DIR_PATH + fileName);
-            Player.PlayLooping();
-        }
-    }
-}
+    } }
+

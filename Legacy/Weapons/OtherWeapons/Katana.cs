@@ -1,8 +1,8 @@
 ﻿using Legacy;
 using Legacy.Enemies;
-using static System.Net.Mime.MediaTypeNames;
 
-namespace Legacy.Weapons.OtherWeapons
+
+namespace Legacy.Weapons
 {
     public class Katana : Weapon, IPostSpecial
     {
@@ -18,12 +18,10 @@ namespace Legacy.Weapons.OtherWeapons
         {
             if(enemy.Health > 0)
             {
-                var temp = hero.Pos;
-                hero.Pos = enemy.Pos;
-                enemy.Pos = temp;
+                FloorSession.SwapPosition(hero, enemy);
                 hero.Stagger += 4;
                 FloorSession.WriteNewPosition(hero.Icon, hero.Pos, ConsoleColor.Cyan);
-                FloorSession.WriteNewPosition(enemy.Icon, enemy.Pos);
+                FloorSession.WriteNewPosition(enemy.Icon, enemy.Pos, enemy.IconColor);
             }
         }
     }

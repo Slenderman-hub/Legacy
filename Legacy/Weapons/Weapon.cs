@@ -7,6 +7,7 @@ namespace Legacy.Weapons
         public Weapon()
         {
             Icon = '!';
+            IconColor = ConsoleColor.Magenta;
         }
         public string Name { get; protected set; } = string.Empty;
         public string Description { get; protected set; } = string.Empty;

@@ -7,7 +7,7 @@ namespace Legacy.Weapons
         public Fist() 
         {
             Name = "Кулак";
-            Damage = 1;
+            Damage = 100;
             Description = "Все проблемы можно решить кулаками";
             Special = "Лечит на [2] здоровья, после убийства противника";
 

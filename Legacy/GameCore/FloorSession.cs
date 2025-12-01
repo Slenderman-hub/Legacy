@@ -11,11 +11,16 @@ namespace Legacy
     {
         public static List<MapEntity> Entities = new List<MapEntity>();
 
-        public static bool FloorIsRunning = true;
+        public static bool FloorIsRunning = false;
         public bool StartFloor()
         {
+            //MusicPlayer.Play();
+            FloorIsRunning = true;
             MapGen.GenerateMap();
-            DrawMap();          
+            DrawMap();
+            MusicPlayer.Play();
+            
+            Console.Write($"            Оружие: {GameSession.Hero.EquipedWeapon.Name}     {Console.WindowWidth / 2.95}                      Ошеломление:{GameSession.Hero.Stagger}                    HP:{GameSession.Hero.Health} / {GameSession.Hero.MaxHealth}  Золото: {GameSession.Hero.Gold}      \r");
             while (FloorIsRunning)
             {
                 if (GameSession.Hero.Health <= 0)
@@ -25,10 +30,11 @@ namespace Legacy
                 }
 
                 Thread.Sleep(10);
-                EnemiesMove();
                 HeroMove();
+                EnemiesMove();
 
-                Console.Write($"            Оружие: {GameSession.Hero.EquipedWeapon.Name}                           Ошеломление:{GameSession.Hero.Stagger}                    HP:{GameSession.Hero.Health}  Золото: {GameSession.Hero.Gold}       \r");
+                Console.Write($"            Оружие: {GameSession.Hero.EquipedWeapon.Name}     {Console.WindowWidth}                      Ошеломление:{GameSession.Hero.Stagger}                    HP:{GameSession.Hero.Health} / {GameSession.Hero.MaxHealth}  Золото: {GameSession.Hero.Gold}      \r");
+                
                 
             }
             
@@ -69,8 +75,17 @@ namespace Legacy
                 case ConsoleKey.D:
                     GameSession.Hero.Action(Actions.Right);
                     break;
+                case ConsoleKey.R:
+                    GameSession.InvInterface.OpenInterface(InventoryInterface.TabTypes.Weapons);
+                    break;
+                case ConsoleKey.J:
+                    GameSession.InvInterface.OpenInterface(InventoryInterface.TabTypes.Bestiary);
+                    break;
                 case ConsoleKey.I:
-                    GameSession.Hero.HeroInventory.DisplayInventory();
+                    GameSession.InvInterface.OpenInterface(InventoryInterface.TabTypes.Items);
+                    break;
+                case ConsoleKey.Spacebar:
+                    GameSession.Hero.Action(Actions.Swap);
                     break;
                 case ConsoleKey.Escape:
                     GameSession.Hero.HeroInventory.DisplayInventory();
@@ -81,18 +96,24 @@ namespace Legacy
         }
         public static void DrawMap()
         {
+            Console.Clear();
             for (int i = 0; i < Map.GetLength(0); i++)
             {
+                foreach (var item in Enumerable.Range(0, (int)(Console.WindowWidth / 2.95)))
+                    Console.Write(" ");
+
                 for (int j = 0; j < Map.GetLength(1); j++)
                 {
                     if (Map[i, j] == '|' && Location == Locations.Castle)
-                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
                     if (Map[i, j] == '&')
                         Console.ForegroundColor = ConsoleColor.Yellow;
                     if (Map[i,j] == '!')
                         Console.ForegroundColor = ConsoleColor.Magenta;
                     if (Map[i, j] == '#')
                         Console.ForegroundColor = ConsoleColor.Yellow;
+                    if (Map[i, j] == '@')
+                        Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write(Map[i, j]);
 
                     Console.ForegroundColor = ConsoleColor.White;
@@ -105,11 +126,17 @@ namespace Legacy
         {
             var defaultPos = Console.GetCursorPosition();
             Map[value.y, value.x] = s;
-            Console.SetCursorPosition(value.x, value.y);
+            Console.SetCursorPosition(value.x + MAP_INDENT, value.y);
             Console.ForegroundColor = color;
             Console.Write(Map[value.y, value.x]);
             Console.ForegroundColor = ConsoleColor.White;
             Console.SetCursorPosition(defaultPos.Left, defaultPos.Top);
+        }
+        public static void SwapPosition(MapEntity entity1, MapEntity entity2)
+        {
+            var temp = entity1.Pos;
+            entity1.Pos = entity2.Pos;
+            entity2.Pos = temp;
         }
     }
 }

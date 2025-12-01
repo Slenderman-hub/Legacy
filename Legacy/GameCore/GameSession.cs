@@ -1,32 +1,38 @@
 ﻿
 
+using System;
+
 namespace Legacy
 {
     public class MapEntity
     {
         public char Icon { get; protected set; }
         public (int x, int y) Pos { get; set; }
+        public ConsoleColor IconColor { get; protected set; }
     }
     public static class GameSession
     {
-        public const int WIDTH = 100; 
-        public const int HEIGHT = 50; 
+        public static InventoryInterface InvInterface { get; private set; }
+        public const int MAP_WIDTH = 100; 
+        public const int MAP_HEIGHT = 50;
+        public static readonly int MAP_INDENT = (int)(Console.WindowWidth / 2.95);
         public static bool GameIsRunning { get; set; } = false;
 
-        public static char[,] Map;
         public static Hero Hero = new Hero();
         public static int Level = 11;
         public static Locations Location = Locations.Castle;
+
+        public static char[,] Map;
         public enum Actions
         {
             Up = 1,
-            Down = 2,
-            Left = 3,
-            Right = 4,
-
+            Down,
+            Left,
+            Right,
+            Swap,
             Inventory,
+            Use,
             Exit,
-            Use
         }
         public enum Locations
         {
@@ -36,6 +42,8 @@ namespace Legacy
 
         public static bool StartSession()
         {
+            Console.CursorVisible = false;
+            InvInterface = new InventoryInterface();
             GameIsRunning = true;
             while (GameIsRunning)
             {
@@ -44,13 +52,18 @@ namespace Legacy
                 if (!result)
                     return false;
 
-                if (result && Level == 24)
-                    return true;
-
             }
             return false;
             
 
+        }
+        public static ConsoleKey UserInput(int milliseconds)
+        {
+            Thread.Sleep(milliseconds);
+            ConsoleKeyInfo key = default;
+            while (Console.KeyAvailable)
+                key = Console.ReadKey(true);
+            return key.Key;
         }
 
 

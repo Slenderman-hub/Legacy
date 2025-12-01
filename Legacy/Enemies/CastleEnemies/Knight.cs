@@ -15,7 +15,7 @@ namespace Legacy.Enemies
             Description = "Стальное сердце закаляет от ударов, а боевой дух не позволяет находится долго в ошеломлении.";
             Type = "Нежить";
             Health = 10;
-            Damage = 1;
+            Damage = 2;
             Stagger = -1;
         }
         

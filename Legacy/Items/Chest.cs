@@ -7,14 +7,18 @@ namespace Legacy.Items
         public Chest()
         {
             Icon = '#';
+            IconColor = ConsoleColor.Yellow;
         }
         public virtual bool Open()
         {
             var result = Random.Shared.Next(1, 101);
-            if (result == 100)
+            if (result == 100 && Random.Shared.Next(1,101) == 100)
             {
-                FloorSession.WriteNewPosition('M', Pos);
-                FloorSession.Entities.Add(new Mimic(Pos.x,Pos.y));
+                var mimic = new Mimic(Pos.x, Pos.y);
+                FloorSession.WriteNewPosition('M', mimic.Pos,mimic.IconColor);
+                FloorSession.Entities.Add(mimic);
+                mimic.Attack(GameSession.Hero);
+
                 return false;
             }
 
@@ -28,17 +32,9 @@ namespace Legacy.Items
             }
             else if (result >= 50)
             {
-                GameSession.Hero.Gold += 25;
+                GameSession.Hero.Gold += result / 2;
             }
-            else if (result >= 30)
-            {
-                GameSession.Hero.Gold += 15;
-            }
-            else
-            {
-                GameSession.Hero.Gold += 5;
-                
-            }
+
             return true;
         }
     }

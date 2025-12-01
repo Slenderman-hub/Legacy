@@ -1,7 +1,6 @@
 ﻿using Legacy.Enemies;
 using Legacy.Items;
 using Legacy.Weapons;
-using Legacy.Weapons.OtherWeapons;
 using static Legacy.FloorSession;
 using static Legacy.GameSession;
 
@@ -13,16 +12,20 @@ namespace Legacy
         public Inventory HeroInventory = new Inventory();
         public int Stagger = 0;
         public Weapon EquipedWeapon;
+        
 
-        public decimal Health { get; set; } = 10;
-        public decimal MaxHealth = 10;
+        public decimal Health { get; set; } = 1000;
+        public decimal MaxHealth = 1000;
         public Hero()
         {
-            //Fist()
+            
             Pos = (1, 1);
             Icon = '&';
+            IconColor = ConsoleColor.Red;
+            HeroInventory.Weapons.Add(new Fist());
             HeroInventory.Weapons.Add(new Katana());
-            EquipedWeapon = HeroInventory.Weapons[0];
+            HeroInventory.Weapons.Add(new Oathblade());
+            EquipedWeapon = HeroInventory.Weapons.First();
         }
         public void Action(Actions action)
         {
@@ -38,7 +41,7 @@ namespace Legacy
                         HandleNextTile(Pos.x, Pos.y - 1);
                     break;
                 case Actions.Down:
-                    if (Pos.y + 1 < HEIGHT - 1)
+                    if (Pos.y + 1 < MAP_HEIGHT - 1)
                         HandleNextTile(Pos.x, Pos.y + 1);
                     break;
                 case Actions.Left:
@@ -46,12 +49,64 @@ namespace Legacy
                         HandleNextTile(Pos.x - 1, Pos.y);
                     break;
                 case Actions.Right:
-                    if (Pos.x + 1 < WIDTH)
+                    if (Pos.x + 1 < MAP_WIDTH)
                         HandleNextTile(Pos.x + 1, Pos.y);
+                    break;
+                case Actions.Swap:
+                    SwapNextTile();
                     break;
                 default:
                     break;
             }
+        }
+
+        private void SwapNextTile()
+        {
+            Stagger += 2;
+            WriteNewPosition(Icon, Pos, ConsoleColor.Green);
+            (int x, int y) next = GetNextTile();
+            MapEntity nextEntity = Entities.FirstOrDefault(e => e.Pos == next);
+            if (nextEntity is null)
+            {
+                WriteNewPosition(Icon, Pos, IconColor);
+            return;
+
+            }
+            SwapPosition(nextEntity, this);
+            WriteNewPosition(Icon, Pos, IconColor);
+            WriteNewPosition(nextEntity.Icon, nextEntity.Pos, nextEntity.IconColor);
+            
+
+        }
+
+        private (int x, int y) GetNextTile()
+        {
+
+            var userInput = Console.ReadKey(true).Key;
+            switch (userInput)
+            {
+                case ConsoleKey.W:
+                    if(Pos.y - 1 >= 0)
+                        return (Pos.x, Pos.y - 1);
+                    break;
+                case ConsoleKey.S:
+                    if(Pos.y + 1 < MAP_HEIGHT - 1)
+                        return (Pos.x, Pos.y + 1);
+                    break;
+                case ConsoleKey.A:
+                    if (Pos.x - 1 >= 0)
+                        return (Pos.x - 1, Pos.y);
+                    break;
+                case ConsoleKey.D:
+                    if(Pos.x + 1 < MAP_WIDTH)
+                        return (Pos.x + 1, Pos.y);
+                    break;
+                default:
+                    GetNextTile();
+                    break;
+                
+            }
+            return (0, 0);
         }
 
         private void HandleNextTile(int x, int y)
@@ -62,7 +117,7 @@ namespace Legacy
                 case ' ':
                     WriteNewPosition(' ', (Pos.x, Pos.y));
                     Pos = next;
-                    WriteNewPosition(Icon, (Pos.x, Pos.y), ConsoleColor.Yellow);
+                    WriteNewPosition(Icon, (Pos.x, Pos.y), IconColor);
                     break;
                 case '|':
                     break;
@@ -79,6 +134,10 @@ namespace Legacy
                     if (result)
                         WriteNewPosition(' ', next);
                     Entities.Remove(chest);
+                    break;
+                case '@':
+                    Portal portal = (Portal)Entities.FirstOrDefault(p => p.Pos == next);
+                    portal.Teleport();
                     break;
                 default:
                     Enemy enemy = (Enemy)Entities.FirstOrDefault(e => e.Pos == next);
@@ -98,6 +157,7 @@ namespace Legacy
             {
                 WriteNewPosition(' ', (enemy.Pos.x, enemy.Pos.y));
                 Entities.Remove(enemy);
+                enemy.OnDeath();
             }
             if (EquipedWeapon is IPostSpecial postCast)
                 postCast.PostCast(this, enemy);
