@@ -1,4 +1,5 @@
-﻿using Legacy.Items;
+﻿using Legacy.Enemies;
+using Legacy.Items;
 using Legacy.Weapons;
 
 namespace Legacy
@@ -10,6 +11,7 @@ namespace Legacy
 
         private readonly List<Weapon> Weapons = GameSession.Hero.HeroInventory.Weapons;
         private readonly List<Item> Items = GameSession.Hero.HeroInventory.Items;
+        private readonly Dictionary<string, Enemy> Bestiary = GameSession.Hero.HeroInventory.Bestiary.Creatures;
 
         private int _selectedIndex = 0;
         private int _scrollOffset = 0;
@@ -27,18 +29,18 @@ namespace Legacy
         public void OpenInterface(TabTypes tabType)
         {
             TabType = tabType;
-            _itemsPerPage = HEIGHT / 3;
-            Console.Clear();
+            _itemsPerPage = 5;
+            
             switch (TabType)
             {
                 case TabTypes.Weapons:
-                    OpenWeapons();
+                    Open(DrawWeapons);
                     break;
                 case TabTypes.Items:
-                    OpenItems();
+                    Open(DrawItems);
                     break;
                 case TabTypes.Bestiary:
-                    OpenBestiary();
+                    Open(DrawBestiary);
                     break;
                 case TabTypes.Save:
                     //TODO SaveGame()
@@ -47,24 +49,31 @@ namespace Legacy
             FloorSession.DrawMap();
 
         }
-        private void OpenWeapons()
+        private void Open(Action drawSomething)
         {
+            Console.Clear();
             DrawCore();
             DrawTabs();
             _selectedIndex = 0;
             _scrollOffset = 0;
-            DrawWeapons();
+            drawSomething();
             while (true)
             {
-                switch (GameSession.UserInput(50))
+                switch (GameSession.UserInput(10))
                 {
                     case ConsoleKey.Escape:
                         return;
                     case ConsoleKey.J:
-                        OpenBestiary();
+                        TabType = TabTypes.Bestiary;
+                        Open(DrawBestiary);
                         return;
                     case ConsoleKey.I:
-                        OpenItems();
+                        TabType = TabTypes.Items;
+                        Open(DrawItems);
+                        return;
+                    case ConsoleKey.R:
+                        TabType = TabTypes.Weapons;
+                        Open(DrawWeapons);
                         return;
                     case ConsoleKey.L:
                         //Save();
@@ -75,122 +84,279 @@ namespace Legacy
                             _selectedIndex--;
                             if (_selectedIndex < _scrollOffset)
                                 _scrollOffset = _selectedIndex;
-                            DrawWeapons();
+                            drawSomething();
                         }
                         break;
                     case ConsoleKey.S:
-                        if (_selectedIndex < Weapons.Count - 1)
-                        {
-                            _selectedIndex++;
-                            if (_selectedIndex >= _scrollOffset + _itemsPerPage)
-                                _scrollOffset = _selectedIndex - _itemsPerPage + 1;
-                            DrawWeapons();
-                        }
+                        int count = 0;
+                        if (TabType == TabTypes.Weapons)
+                            count = Weapons.Count - 1;
+                        if (TabType == TabTypes.Items)
+                            count = Items.Count - 1;
+
+                        if (_selectedIndex < count)
+                            {
+                                _selectedIndex++;
+                                if (_selectedIndex >= _scrollOffset + _itemsPerPage)
+                                    _scrollOffset = _selectedIndex - _itemsPerPage + 1;
+                                drawSomething();
+                            }
+
                         break;
                     case ConsoleKey.Enter:
-                        GameSession.Hero.EquipedWeapon = Weapons[_selectedIndex];
-                        DrawWeapons();
+                        if(TabType == TabTypes.Weapons)
+                            GameSession.Hero.EquippedWeapon = Weapons[_selectedIndex];
+                        if (TabType == TabTypes.Items)
+                            GameSession.Hero.EquippedItem = Items[_selectedIndex];
+                        drawSomething();
                         break;
 
 
                 }
             }
-            
         }
 
-        private void DrawWeapons()
+        private void DrawBestiary()
         {
-            
+            throw new NotImplementedException();
+        }
+
+        private void DrawItems()
+        {
+            TabType = TabTypes.Items;
+            int highlightWidth = WIDTH / 2 - 2; 
+
+            //Список
             for (int i = 0; i < _itemsPerPage; i++)
             {
                 int itemIndex = _scrollOffset + i;
-                if (itemIndex < Weapons.Count)
+                int cursorY = (i + 5) + i;
+
+                Console.SetCursorPosition(1, cursorY);
+
+                if (itemIndex < Items.Count)
                 {
+                    
                     if (itemIndex == _selectedIndex)
                     {
                         Console.BackgroundColor = ConsoleColor.Yellow;
                         Console.ForegroundColor = ConsoleColor.Black;
                     }
-
-                    Console.SetCursorPosition(1, (i + 5) + i);
-
-                    var weapon = Weapons[itemIndex];
-                    string mark = GameSession.Hero.EquipedWeapon == weapon ? "[X]" : "[ ]";
-                    string result = $"{mark} {weapon.Name}";
-                    Console.Write(result.PadRight(WIDTH / 2 - 2 - result.Length));
-                    Console.ResetColor();
-                    //Имя
-                    Console.SetCursorPosition(WIDTH / 2 + 1, HEIGHT / 12);
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write(Weapons[_selectedIndex].Name.ToUpper().PadLeft((3 * WIDTH / 16) + (3 * WIDTH / 16) / 3));
-                    //Урон
-                    Console.SetCursorPosition(WIDTH / 2 + 1, HEIGHT / 12 * 3);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("Урон :  ".ToUpper().PadLeft(10) + $"{Weapons[_selectedIndex].Damage}".PadRight(10));
-                    
-                    //Описание предмета:
-                    int startDescr = HEIGHT / 12 * 4;
-                    Console.SetCursorPosition(WIDTH / 2 + 1, startDescr);
-                    var descr = "  ОПИСАНИЕ: " + Weapons[_selectedIndex].Description.PadRight(WIDTH * 2);
-                    
-                    if (descr.Length > WIDTH / 2 - 10)
-                    {
-                        for (int j = 0; j < descr.Length; j++)
-                        {
-                            Console.Write(descr[j]);
-                            if (j % (WIDTH / 2 - 10) == 0)
-                            {
-                                startDescr += 2;
-                                Console.SetCursorPosition(WIDTH / 2 + 1, startDescr);
-                            }
-                        }
-                        
-                    }
                     else
                     {
-                        Console.Write(descr);
+                        Console.ResetColor();
                     }
-                    //Описание способности
-                    var curr = Console.GetCursorPosition();
-                    curr.Top += 1;
-                    Console.SetCursorPosition(WIDTH / 2 + 1, curr.Top);
-                    var special = $"  [ОСОБЕННОСТЬ]: {Weapons[_selectedIndex].Special}".PadRight(WIDTH*2);
 
-                    if (special.Length > WIDTH / 2 - 10)
+                    var item = Items[itemIndex];
+                    string mark = GameSession.Hero.EquippedItem == item ? "(X)" : "( )";
+                    string itemText = $"{mark} {item.Name}";
+
+                    
+                    if (itemText.Length > highlightWidth)
                     {
-                        for (int j = 0; j < special.Length; j++)
-                        {
-                            Console.Write(special[j]);
-                            if (j % (WIDTH / 2 - 10) == 0)
-                            {
-                                curr.Top += 2;
-                                Console.SetCursorPosition(WIDTH / 2 + 1, curr.Top);
-                            }
-                        }
-
+                        itemText = itemText.Substring(0, highlightWidth);
                     }
-                    else
+
+                    
+                    Console.Write(itemText);
+
+                    
+                    if (itemText.Length < highlightWidth)
                     {
-                        Console.Write(special);
+                        Console.Write(new string(' ', highlightWidth - itemText.Length));
                     }
 
-
-                    //Левая нижняя подсказка
                     Console.ResetColor();
-                    Console.SetCursorPosition(3, HEIGHT - 3);
-                    Console.Write($"[{itemIndex+ 1 - _scrollOffset}/{Weapons.Count}] │ [W/S] - Листать Вверх/Вниз │ [Enter] - Экипировать");
+                }
+                else
+                {
+                    
+                    Console.Write(new string(' ', highlightWidth));
                 }
             }
+
+
+            // Панель описания
+            if (_selectedIndex >= 0 && _selectedIndex < Items.Count)
+            {
+                int rightPanelStartX = WIDTH / 2 + 1;
+                int rightPanelWidth = WIDTH / 2 - 2;
+
+                for (int row = HEIGHT / 12; row < HEIGHT / 6; row++)
+                {
+                    Console.SetCursorPosition(rightPanelStartX, row);
+                    Console.Write(new string(' ', rightPanelWidth));
+                }
+                for (int row = HEIGHT / 6 + 1; row < HEIGHT - 3; row++)
+                {
+                    Console.SetCursorPosition(rightPanelStartX, row);
+                    Console.Write(new string(' ', rightPanelWidth));
+                }
+
+                // Имя предмета 
+                string name = Items[_selectedIndex].Name.ToUpper();
+                int nameX = rightPanelStartX + (rightPanelWidth - name.Length) / 2;
+                Console.SetCursorPosition(nameX, HEIGHT / 12);
+                Console.ForegroundColor = Items[_selectedIndex].InventoryColor;
+                Console.Write(name);
+
+                // Описание
+                int descY = HEIGHT / 6 + 4;
+                Console.SetCursorPosition(rightPanelStartX, descY);
+                Console.ResetColor();
+                string descr = "ОПИСАНИЕ: " + Items[_selectedIndex].Description;
+
+                
+                int currentDescrLine = 0;
+                for (int j = 0; j < descr.Length; j++)
+                {
+                    Console.Write(descr[j]);
+                    if ((j + 1) % (rightPanelWidth) == 0)
+                    {
+                        currentDescrLine++;
+                        Console.SetCursorPosition(rightPanelStartX, descY + currentDescrLine);
+                    }
+                }
+
+            }
+
+            // Подсказка в левом нижнем углу.
+            Console.ResetColor();
+            Console.SetCursorPosition(3, HEIGHT - 3);
+            Console.Write($"[{_selectedIndex + 1}/{Items.Count}] │ [W/S] - Листать Вверх/Вниз │ [Enter] - Экипировать");
         }
 
-        private void OpenBestiary()
+        private void DrawWeapons()
         {
-            throw new NotImplementedException();
-        }
+            TabType = TabTypes.Weapons;
 
-        private void OpenItems()
-        {
-            throw new NotImplementedException();
+            
+            int highlightWidth = WIDTH / 2 - 2; 
+
+            for (int i = 0; i < _itemsPerPage; i++)
+            {
+                int itemIndex = _scrollOffset + i;
+                int cursorY = (i + 5) + i;
+
+                Console.SetCursorPosition(1, cursorY);
+
+                if (itemIndex < Weapons.Count)
+                {
+                    
+                    if (itemIndex == _selectedIndex)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Yellow;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                    }
+                    else
+                    {
+                        Console.ResetColor();
+                    }
+
+                    var weapon = Weapons[itemIndex];
+                    string mark = GameSession.Hero.EquippedWeapon == weapon ? "[X]" : "[ ]";
+                    string itemText = $"{mark} {weapon.Name}";
+
+                    
+                    if (itemText.Length > highlightWidth)
+                    {
+                        itemText = itemText.Substring(0, highlightWidth);
+                    }
+
+                    
+                    Console.Write(itemText);
+
+                    
+                    if (itemText.Length < highlightWidth)
+                    {
+                        Console.Write(new string(' ', highlightWidth - itemText.Length));
+                    }
+
+                    Console.ResetColor();
+                }
+                else
+                {
+                    
+                    Console.Write(new string(' ', highlightWidth));
+                }
+            }
+
+            
+            // Правая панель с деталями предмета
+            if (_selectedIndex >= 0 && _selectedIndex < Weapons.Count)
+            {
+                int rightPanelStartX = WIDTH / 2 + 1;
+                int rightPanelWidth = WIDTH / 2 - 2;
+
+                
+                for (int row = HEIGHT / 12; row < HEIGHT / 6; row++)
+                {
+                    Console.SetCursorPosition(rightPanelStartX, row);
+                    Console.Write(new string(' ', rightPanelWidth));
+                }
+
+                
+                for (int row = HEIGHT / 6 + 1; row < HEIGHT - 3; row++)
+                {
+                    Console.SetCursorPosition(rightPanelStartX, row);
+                    Console.Write(new string(' ', rightPanelWidth));
+                }
+
+                
+                string name = Weapons[_selectedIndex].Name.ToUpper();
+                int nameX = rightPanelStartX + (rightPanelWidth - name.Length) / 2;
+                Console.SetCursorPosition(nameX, HEIGHT / 12);
+                Console.ForegroundColor = Weapons[_selectedIndex].InventoryColor;
+                Console.Write(name);
+
+                
+                Console.SetCursorPosition(rightPanelStartX, HEIGHT / 6 + 2);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                string damageText = $"УРОН: {Weapons[_selectedIndex].Damage}";
+                int damageX = rightPanelStartX + (rightPanelWidth - damageText.Length) / 2;
+                Console.SetCursorPosition(damageX, HEIGHT / 6 + 2);
+                Console.Write(damageText);
+
+                
+                int descY = HEIGHT / 6 + 4;
+                Console.SetCursorPosition(rightPanelStartX, descY);
+                Console.ResetColor();
+                string descr = "ОПИСАНИЕ: " + Weapons[_selectedIndex].Description;
+
+                
+                int currentDescrLine = 0;
+                for (int j = 0; j < descr.Length; j++)
+                {
+                    Console.Write(descr[j]);
+                    if ((j + 1) % (rightPanelWidth) == 0)
+                    {
+                        currentDescrLine++;
+                        Console.SetCursorPosition(rightPanelStartX, descY + currentDescrLine);
+                    }
+                }
+
+                
+                int specialY = descY + currentDescrLine + 2;
+                Console.SetCursorPosition(rightPanelStartX, specialY);
+                string special = $"[ОСОБЕННОСТЬ]: {Weapons[_selectedIndex].Special}";
+
+                
+                int currentSpecialLine = 0;
+                for (int j = 0; j < special.Length; j++)
+                {
+                    Console.Write(special[j]);
+                    if ((j + 1) % (rightPanelWidth) == 0)
+                    {
+                        currentSpecialLine++;
+                        Console.SetCursorPosition(rightPanelStartX, specialY + currentSpecialLine);
+                    }
+                }
+            }
+
+            
+            Console.ResetColor();
+            Console.SetCursorPosition(3, HEIGHT - 3);
+            Console.Write($"[{_selectedIndex + 1}/{Weapons.Count}] │ [W/S] - Листать Вверх/Вниз │ [Enter] - Экипировать");
         }
 
 

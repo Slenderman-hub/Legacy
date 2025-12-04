@@ -11,6 +11,7 @@ namespace Legacy.Weapons
             Damage = 3;
             Description = "Будет служить вам ВЕРОЙ и правдой. Вы будете в это ВЕРИТЬ?";
             Special = "Наносит [2х] кратный урон по врагам типа нежить и накладывает им дополнительное 1 ошеломление. Если, противник не является ей, вы получаете 3 ошеломления и снимаете 3 ошеломления с противника";
+            InventoryColor = ConsoleColor.Yellow;
         }
         public void PreCast(Hero hero, Enemy enemy)
         {

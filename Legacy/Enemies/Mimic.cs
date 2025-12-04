@@ -17,11 +17,11 @@ namespace Legacy.Enemies
         }
         public override void Attack(Hero hero)
         {
-            if (hero.EquipedWeapon is not Fist)
+            if (hero.EquippedWeapon is not Fist)
             {
-                this.LootWeapons.Add(hero.EquipedWeapon);
-                hero.HeroInventory.Weapons.Remove(hero.EquipedWeapon);
-                hero.EquipedWeapon = hero.HeroInventory.Weapons[0];
+                this.LootWeapons.Add(hero.EquippedWeapon);
+                hero.HeroInventory.Weapons.Remove(hero.EquippedWeapon);
+                hero.EquippedWeapon = hero.HeroInventory.Weapons[0];
 
             }
             else

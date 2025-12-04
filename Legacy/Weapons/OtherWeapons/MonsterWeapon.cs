@@ -11,6 +11,7 @@ namespace Legacy.Weapons
             Damage = damage;
             Description = "Вам настолько понравилось оружие противника, что вы решили его прихватить? Похвально";
             Special = "Очень воняет";
+            InventoryColor = ConsoleColor.DarkGreen;
         }
 
         public void PreCast(Hero hero, Enemy enemy)

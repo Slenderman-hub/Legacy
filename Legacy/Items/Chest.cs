@@ -7,7 +7,7 @@ namespace Legacy.Items
         public Chest()
         {
             Icon = '#';
-            IconColor = ConsoleColor.Yellow;
+            IconColor = ConsoleColor.DarkYellow;
         }
         public virtual bool Open()
         {

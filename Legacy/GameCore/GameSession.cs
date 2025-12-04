@@ -8,21 +8,21 @@ namespace Legacy
     {
         public char Icon { get; protected set; }
         public (int x, int y) Pos { get; set; }
-        public ConsoleColor IconColor { get; protected set; }
+        public ConsoleColor IconColor { get; set; }
     }
     public static class GameSession
     {
         public static InventoryInterface InvInterface { get; private set; }
         public const int MAP_WIDTH = 100; 
         public const int MAP_HEIGHT = 50;
-        public static readonly int MAP_INDENT = (int)(Console.WindowWidth / 2.95);
+        public static readonly int CenterIndent = (int)(Console.WindowWidth / 2.95);
         public static bool GameIsRunning { get; set; } = false;
 
         public static Hero Hero = new Hero();
         public static int Level = 11;
         public static Locations Location = Locations.Castle;
 
-        public static char[,] Map;
+        //public static char[,] Map;
         public enum Actions
         {
             Up = 1,

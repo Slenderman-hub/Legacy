@@ -1,7 +1,8 @@
-﻿using static Legacy.GameSession;
-using static Legacy.FloorSession;
-using  Legacy.Items;
+﻿using  Legacy.Items;
 using Legacy.Weapons;
+using System.Text.Json.Serialization;
+using static Legacy.FloorSession;
+using static Legacy.GameSession;
 
 namespace Legacy.Enemies
 {
@@ -11,16 +12,25 @@ namespace Legacy.Enemies
         public List<Weapon> LootWeapons = new List<Weapon>(0);
 
         public int Stagger = 0;
+        [JsonInclude]
         public string Name = string.Empty;
+        [JsonInclude]
         public string Description = string.Empty;
+        [JsonInclude]
         public decimal Health;
+        [JsonInclude]
         public decimal Damage;
-
+        [JsonInclude]
         public string Type = string.Empty;
         public Enemy(int x, int y)
         {
             Pos = (x, y);
-            IconColor = ConsoleColor.White;
+            IconColor = ConsoleColor.DarkGray;
+        }
+        [JsonConstructor]
+        public Enemy()
+        {
+
         }
         public virtual void Action(Actions action)
         {
@@ -88,6 +98,18 @@ namespace Legacy.Enemies
                 GameSession.Hero.HeroInventory.Items.Add(item);
             foreach (Weapon item in LootWeapons)
                 GameSession.Hero.HeroInventory.Weapons.Add(item);
+        }
+        public static Enemy Copy(Enemy enemy)
+        {
+            return  new Enemy(0, 0)
+            {
+                Name = enemy.Name,
+                Icon = enemy.Icon,
+                Description = enemy.Description,
+                Damage = enemy.Damage,
+                Health = enemy.Health,
+                Type = enemy.Type
+            };
         }
     }
     

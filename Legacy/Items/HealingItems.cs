@@ -1,20 +1,35 @@
 ﻿using Legacy.Enemies;
 namespace Legacy.Items
 {
-    public class HealingPotion : Item , IUseOnEnemy, IUseOnHero
+    public class HealingPotion : Item 
     {
-        public HealingPotion() : base("Семь Потов Лекаря Шмякс")
+        public HealingPotion() 
         {
-            Description = "Зловонный отвар , исцеляющий [5] О.З . Советуем пить, только при смертельных случаях";
+            Name = "7# Подвиг Лекаря Шмякс";
+            Description = "Зловонный отвар , который на вкус, как толпа бегемотов. Исцеляет [5] О.З . Советуем пить, только при смертельных случаях.";
+            InventoryColor = ConsoleColor.Red;
         }
 
-        public void UseOnEnemy(Enemy enemy)
+        public override void UseOnEnemy(Enemy enemy)
         {
             if (enemy.Type == "Нежить")
+            {
                 enemy.Health = 1;
+
+            }
+            else
+            {
+                enemy.Health *= 2;
+                enemy.IconColor = ConsoleColor.DarkGreen;
+                enemy.LootItems.Add(new HealingPotion() { Name = "6# Подвиг Аптекаря Шмуньк", InventoryColor = ConsoleColor.DarkRed});
+                enemy.LootItems.Add(new HealingPotion() { Name = "5# Подвиг Философа Чпеньк", InventoryColor = ConsoleColor.DarkRed });
+                FloorSession.WriteNewPosition(enemy.Icon, enemy.Pos, enemy.IconColor);
+
+            }
+            Consume();
         }
 
-        public void UseOnHero(Hero hero)
+        public override void UseOnHero(Hero hero)
         {
             if(hero.Health < 2)
             {
@@ -27,6 +42,7 @@ namespace Legacy.Items
                 if (hero.Health > hero.MaxHealth)
                     hero.Health = hero.MaxHealth;
             }
+            Consume();
         }
 
 

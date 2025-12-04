@@ -1,24 +1,21 @@
 ﻿using Legacy.Enemies;
 using Legacy.Items;
 using Legacy.Weapons;
-using Legacy.Weapons;
-using static Legacy.GameSession;
-using static Legacy.FloorSession;
-using static Legacy.MapGen;
+using Legacy;
 
 
 namespace Legacy.LocationGens
 {
     static class CastleGen 
     {
-        
+        public static List<(int x, int y)> FreeCells = new List<(int x, int y)>();
         public static void InitializeCastle()
         {
-            Entities = new List<MapEntity>();
+            FloorSession.Entities = new List<MapEntity>();
 
             Stack<(int x, int y)> stack = new Stack<(int x, int y)>();
 
-            Map[1, 1] = '&';
+            FloorSession.Map[1, 1] = '&';
             stack.Push((1, 1));
 
             var DeadEnds = new HashSet<(int x, int y)>();
@@ -36,10 +33,10 @@ namespace Legacy.LocationGens
                     int wallX = (current.x + next.x) / 2;
                     int wallY = (current.y + next.y) / 2;
 
-                    Map[wallY, wallX] = ' ';
+                    FloorSession.Map[wallY, wallX] = ' ';
 
 
-                    Map[next.y, next.x] = ' ';
+                    FloorSession.Map[next.y, next.x] = ' ';
 
 
                     stack.Push(next);
@@ -49,17 +46,47 @@ namespace Legacy.LocationGens
                     DeadEnds.Add((current.x, current.y));
                 }
             }
+            InitializePattern();
             FreeCells = DeadEnds.ToList();
+
             InitializePortals();
             InitializeEnemies();
             InitializeWeapons();
             InitializeСhests();
             
         }
+
+        private static void InitializePattern()
+        {
+            switch (Random.Shared.Next(0,101))
+            {
+                case <= 30:
+                    CastleGenPatterns.SquareHalls();
+                    break;
+                case <= 50:
+                    CastleGenPatterns.Square();
+                    CastleGenPatterns.SquareHalls();
+                    break;
+                case <= 60 :
+                    CastleGenPatterns.Square();
+                    break;
+                case <= 70:
+                    CastleGenPatterns.ZigZag();
+                    break;
+                case <= 80:
+                    CastleGenPatterns.Target();
+                    break;
+                default:
+                    CastleGenPatterns.Square();
+                    break;
+            }
+            CastleGenPatterns.WallFix();
+        }
+
         private static void InitializeСhests()
         {
             int i = 0;
-            while (i != MAP_HEIGHT)
+            while (i != GameSession.MAP_HEIGHT)
             {
                 i++;
                 var spawn = FreeCells[Random.Shared.Next(FreeCells.Count)];
@@ -67,8 +94,8 @@ namespace Legacy.LocationGens
                 if (spawn.x != 1 && spawn.y != 1)
                 {
                         var gs = new Chest() { Pos = spawn };
-                        Map[spawn.y, spawn.x] = gs.Icon;
-                        Entities.Add(gs);
+                    FloorSession.Map[spawn.y, spawn.x] = gs.Icon;
+                    FloorSession.Entities.Add(gs);
                 }
             }
         }
@@ -84,16 +111,16 @@ namespace Legacy.LocationGens
                 {
                     i++;
                     FreeCells.Remove(spawn);
-                    var gs = new Portal(Location,Level++);
+                    var gs = new Portal(GameSession.Location, GameSession.Level + 1);
                     gs.Pos = spawn;
-                    Map[spawn.y, spawn.x] = gs.Icon;
-                    Entities.Add(gs);
+                    FloorSession.Map[spawn.y, spawn.x] = gs.Icon;
+                    FloorSession.Entities.Add(gs);
                 }
             }
         }
         private static void InitializeWeapons()
         {
-            int lvlMod = Level % 10;
+            int lvlMod = GameSession.Level % 10;
             int i = 0;
             while(i != 2)
             {
@@ -108,23 +135,23 @@ namespace Legacy.LocationGens
 
                         case 1:
                             var cs = new ClericStaff() { Pos = spawn };
-                            Map[spawn.y, spawn.x] = cs.Icon;
-                            Entities.Add(cs);
+                            FloorSession.Map[spawn.y, spawn.x] = cs.Icon;
+                            FloorSession.Entities.Add(cs);
                             break;
                         case 2:
                             var c = new Claymore() { Pos = spawn };
-                            Map[spawn.y, spawn.x] = c.Icon;
-                            Entities.Add(c);
+                            FloorSession.Map[spawn.y, spawn.x] = c.Icon;
+                            FloorSession.Entities.Add(c);
                             break;
                         case 3:
                             var k = new Katana() { Pos = spawn};
-                            Map[spawn.y, spawn.x] = k.Icon;
-                            Entities.Add(k);
+                            FloorSession.Map[spawn.y, spawn.x] = k.Icon;
+                            FloorSession.Entities.Add(k);
                             break;
                         case 4:
                             var ob = new Oathblade() { Pos = spawn };
-                            Map[spawn.y, spawn.x] = ob.Icon;
-                            Entities.Add(ob);
+                            FloorSession.Map[spawn.y, spawn.x] = ob.Icon;
+                            FloorSession.Entities.Add(ob);
                             break;
                         case 5:
                         case 6:
@@ -140,12 +167,12 @@ namespace Legacy.LocationGens
         }
         private static void InitializeEnemies()
         {
-            int lvlMod = Level == 13 ? 2 : Level % 10;
+            int lvlMod = GameSession.Level == 13 ? 2 : GameSession.Level % 10;
             int i = 0;
-            while (i != MAP_HEIGHT * lvlMod)
+            while (i != GameSession.MAP_HEIGHT * lvlMod)
             {
                 var spawn = FreeCells[Random.Shared.Next(FreeCells.Count)];
-                if (spawn.x >= MAP_WIDTH / 8 || spawn.y >= MAP_HEIGHT / 8)
+                if (spawn.x >= GameSession.MAP_WIDTH / 8 || spawn.y >= GameSession.MAP_HEIGHT / 8)
                 {
                     i++;
                     FreeCells.Remove(spawn);
@@ -153,8 +180,8 @@ namespace Legacy.LocationGens
                     {
                         case 0:
                             var knight = new Knight(spawn.x, spawn.y);
-                            Map[spawn.y, spawn.x] = knight.Icon;
-                            Entities.Add(knight);
+                            FloorSession.Map[spawn.y, spawn.x] = knight.Icon;
+                            FloorSession.Entities.Add(knight);
                             break;
                         default:
                             break;
@@ -166,13 +193,13 @@ namespace Legacy.LocationGens
         private static List<(int x, int y)> GetUnvisitedNeighbors(int x, int y)
         {
             List<(int x, int y)> neighbors = new List<(int x, int y)>();
-            if (x - 2 >= 1 && Map[y, x - 2] == '|')
+            if (x - 2 >= 1 && FloorSession.Map[y, x - 2] == '|')
                 neighbors.Add((x - 2, y));
-            if (x + 2 < MAP_WIDTH - 1 && Map[y, x + 2] == '|')
+            if (x + 2 < GameSession.MAP_WIDTH - 1 && FloorSession.Map[y, x + 2] == '|')
                 neighbors.Add((x + 2, y));
-            if (y - 2 >= 1 && Map[y - 2, x] == '|')
+            if (y - 2 >= 1 && FloorSession.Map[y - 2, x] == '|')
                 neighbors.Add((x, y - 2));
-            if (y + 2 < MAP_HEIGHT - 1 && Map[y + 2, x] == '|')
+            if (y + 2 < GameSession.MAP_HEIGHT - 1 && FloorSession.Map[y + 2, x] == '|')
                 neighbors.Add((x, y + 2));
 
             return neighbors;
