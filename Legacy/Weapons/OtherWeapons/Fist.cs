@@ -1,6 +1,6 @@
 ﻿using Legacy.Enemies;
 
-namespace Legacy.Weapons
+namespace Legacy.Weapons.OtherWeapons
 {
     public class Fist : Weapon , IPostSpecial
     {
@@ -9,7 +9,7 @@ namespace Legacy.Weapons
             Name = "Кулак";
             Damage = 100;
             Description = "Все проблемы можно решить кулаками";
-            Special = "Лечит на [2] здоровья, после убийства противника";
+            Special = "Лечит на [1] здоровья, после убийства противника";
 
         }
 
@@ -17,7 +17,7 @@ namespace Legacy.Weapons
         {
             if(enemy.Health <= 0)
             {
-                hero.Health += 2;
+                hero.Health += 1;
                 if (hero.Health > hero.MaxHealth)
                     hero.Health = hero.MaxHealth;
             }

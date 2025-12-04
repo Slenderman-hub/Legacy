@@ -2,7 +2,7 @@
 using Legacy.Enemies;
 
 
-namespace Legacy.Weapons
+namespace Legacy.Weapons.OtherWeapons
 {
     public class Katana : Weapon, IPostSpecial
     {
@@ -12,6 +12,7 @@ namespace Legacy.Weapons
             Damage = 6.66m;
             Description = "Только настоящий самурай может совладать с отвественностью, что несет этот клинок";
             Special = "Прорубает противника насквозь, тем самым меняя вас местами. Накладывает герою [4] ошеломления, после использования";
+            InventoryColor = ConsoleColor.Cyan;
 
         }
         public void PostCast(Hero hero, Enemy enemy)

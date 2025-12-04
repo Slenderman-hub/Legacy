@@ -13,5 +13,6 @@ namespace Legacy.Weapons
         public string Description { get; protected set; } = string.Empty;
         public string Special { get; protected set; } = string.Empty;
         public decimal Damage { get; set; }
+        public ConsoleColor InventoryColor { get; protected set; } = ConsoleColor.White;
     }
 }

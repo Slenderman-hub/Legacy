@@ -10,4 +10,9 @@ namespace Legacy
     {
         public void PreCast(Hero hero, Enemy enemy);
     }
+
+    public interface IPassiveSpecial
+    {
+        public void PassiveCast(Hero hero);
+    }
 }

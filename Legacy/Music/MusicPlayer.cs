@@ -35,12 +35,12 @@ namespace Legacy.Music{
 
             _currentResourceName = resourceName;
             var assembly = Assembly.GetExecutingAssembly();
-            string fullResourceName = assembly.GetName().Name + ".Music." + resourceName;
+            string fullResourceName = "Legacy.Music." + resourceName;
 
             var resourceStream = assembly.GetManifestResourceStream(fullResourceName);
             _tempFilePath = Path.GetTempFileName() + Path.GetExtension(resourceName);
 
-            using (var fileStream = File.Create(_tempFilePath))
+            using (FileStream fileStream = File.Create(_tempFilePath))
             {
                 resourceStream.CopyTo(fileStream);
             }

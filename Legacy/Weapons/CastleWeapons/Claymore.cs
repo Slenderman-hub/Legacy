@@ -22,7 +22,10 @@ namespace Legacy.Weapons
         public void PostCast(Hero hero, Enemy enemy)
         {
             if (buff)
+            {
                 Damage /= 3;
+                buff = false;
+            }
             if(enemy.Health <= 0)
             {
                 Damage *= 3;

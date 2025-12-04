@@ -19,8 +19,13 @@ namespace Legacy.Items
             FloorSession.FloorIsRunning = false;
             GameSession.Level = Level;
             GameSession.Location = Location;
-            GameSession.Hero.MaxHealth += GameSession.Hero.Gold / 100;
-            GameSession.Hero.Gold = GameSession.Hero.Gold % 100;
+
+            decimal last = GameSession.Hero.MaxHealth;
+            if (GameSession.Hero.Gold > 0)
+                GameSession.Hero.MaxHealth += GameSession.Hero.Gold / 100;
+            if (last != GameSession.Hero.MaxHealth)
+                GameSession.Hero.Gold -= (int)(GameSession.Hero.MaxHealth - last);
+
             GameSession.Hero.Pos = (1, 1);
 
         }

@@ -1,6 +1,7 @@
 ﻿using Legacy.Enemies;
 using Legacy.Items;
 using Legacy.Weapons;
+using Legacy.Weapons.OtherWeapons;
 using static Legacy.FloorSession;
 using static Legacy.GameSession;
 
@@ -11,29 +12,44 @@ namespace Legacy
         public int Gold { get; set; } = 0;
         public Inventory HeroInventory = new Inventory();
         public int Stagger = 0;
-        public Weapon EquipedWeapon;
+        public Weapon EquippedWeapon;
+        public Item EquippedItem = null;
         
 
-        public decimal Health { get; set; } = 1000;
-        public decimal MaxHealth = 1000;
+        public decimal Health { get; set; } = 30;
+        public decimal MaxHealth = 30;
         public Hero()
         {
-            
-            Pos = (1, 1);
             Icon = '&';
             IconColor = ConsoleColor.Red;
             HeroInventory.Weapons.Add(new Fist());
             HeroInventory.Weapons.Add(new Katana());
             HeroInventory.Weapons.Add(new Oathblade());
-            EquipedWeapon = HeroInventory.Weapons.First();
+            HeroInventory.Weapons.Add(new EnvyScythe());
+
+            EquippedWeapon = HeroInventory.Weapons.First();
+            HeroInventory.Items.Add(new HealingPotion());
+            HeroInventory.Items.Add(new HealingPotion());
+            HeroInventory.Items.Add(new HealingPotion());
+            foreach (var item in HeroInventory.Bestiary.Creatures)
+                MaxHealth++;
+
         }
         public void Action(Actions action)
         {
-            if(Stagger > 0)
+            foreach (var item in HeroInventory.Weapons)
+            {
+                if (item is IPassiveSpecial passiveCast)
+                {
+                    passiveCast.PassiveCast(this);
+                }
+            }
+            if (Stagger > 0)
             {
                 Stagger--;
                 return;
-            }       
+            }
+
             switch (action)
             {
                 case Actions.Up:
@@ -55,9 +71,36 @@ namespace Legacy
                 case Actions.Swap:
                     SwapNextTile();
                     break;
+                case Actions.Use:
+                    ManageItem();
+                    break;
                 default:
                     break;
             }
+        }
+        private void ManageItem()
+        {
+            if (EquippedItem is null)
+                return;
+
+            Stagger += 1;
+            WriteNewPosition(Icon, Pos, ConsoleColor.DarkYellow);
+            (int x, int y) next = GetNextTile();
+            MapEntity nextEntity = Entities.FirstOrDefault(e => e.Pos == next);
+
+            if (nextEntity == null || nextEntity is not Enemy)
+            {
+                EquippedItem.UseOnHero(this);
+                
+            }
+            if(nextEntity is Enemy enemy)
+            {
+                if (!GameSession.Hero.HeroInventory.Bestiary.Creatures.ContainsKey(enemy.Name))
+                    GameSession.Hero.HeroInventory.Bestiary.Creatures.Add(enemy.Name, Enemy.Copy(enemy));
+                EquippedItem.UseOnEnemy(enemy);
+            }
+            WriteNewPosition(Icon, Pos, IconColor);
+
         }
 
         private void SwapNextTile()
@@ -109,6 +152,7 @@ namespace Legacy
             return (0, 0);
         }
 
+
         private void HandleNextTile(int x, int y)
         {
             var next = (x, y);
@@ -124,7 +168,7 @@ namespace Legacy
                 case '!':
                     Weapon weapon = (Weapon)Entities.FirstOrDefault(w => w.Pos == next);
                     HeroInventory.Weapons.Add(weapon);
-                    EquipedWeapon = HeroInventory.Weapons.Last();
+                    EquippedWeapon = HeroInventory.Weapons.Last();
                     WriteNewPosition(' ', next);
                     Entities.Remove(weapon);
                     break;
@@ -140,7 +184,11 @@ namespace Legacy
                     portal.Teleport();
                     break;
                 default:
+                    if (MapWriter.WallIcons.Contains(Map[y, x]))
+                        break;
                     Enemy enemy = (Enemy)Entities.FirstOrDefault(e => e.Pos == next);
+                    if (!GameSession.Hero.HeroInventory.Bestiary.Creatures.ContainsKey(enemy.Name))
+                        GameSession.Hero.HeroInventory.Bestiary.Creatures.Add(enemy.Name, Enemy.Copy(enemy));
                     Attack(enemy);
                     break;
             }
@@ -148,9 +196,9 @@ namespace Legacy
 
         private void Attack(Enemy enemy)
         {
-            if (EquipedWeapon is IPreSpecial preCast)
+            if (EquippedWeapon is IPreSpecial preCast)
                 preCast.PreCast(this, enemy);
-            enemy.Health -= EquipedWeapon.Damage;
+            enemy.Health -= EquippedWeapon.Damage;
             
             enemy.Stagger += 1;
             if(enemy.Health <= 0)
@@ -159,7 +207,7 @@ namespace Legacy
                 Entities.Remove(enemy);
                 enemy.OnDeath();
             }
-            if (EquipedWeapon is IPostSpecial postCast)
+            if (EquippedWeapon is IPostSpecial postCast)
                 postCast.PostCast(this, enemy);
 
         }

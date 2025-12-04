@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Legacy.Weapons
+namespace Legacy.Weapons.OtherWeapons
 {
     public class Oathblade : Weapon, IPostSpecial
     {
@@ -13,8 +13,9 @@ namespace Legacy.Weapons
         {
             Name = "Клятвенный клинок";
             Damage = 4.5m;
-            Description = "Твоя смерть повязана судьбою";
-            Special = "После убийства противника СЛУЧАЙНО определитсься одно из следующих событий: 1)Герой получит [+5] к максимальному здоровью 2) Вы будете ранены на [5] урона";
+            Description = "Твоя Смерть повязана судьбою";
+            Special = "После убийства противника СЛУЧАЙНО будет определено одно из следующих событий: 1)Герой получит [+5] к максимальному здоровью 2) Вы будете ранены на [5] урона";
+            InventoryColor = ConsoleColor.DarkRed;
         }
         public void PostCast(Hero hero, Enemy enemy)
         {

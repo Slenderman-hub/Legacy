@@ -7,7 +7,7 @@ namespace Legacy.Items
         public Chest()
         {
             Icon = '#';
-            IconColor = ConsoleColor.Yellow;
+            IconColor = ConsoleColor.DarkYellow;
         }
         public virtual bool Open()
         {
@@ -21,8 +21,7 @@ namespace Legacy.Items
 
                 return false;
             }
-
-            if(result >= 90)
+            else if(result >= 90)
             {
                 GameSession.Hero.HeroInventory.Items.Add(new GrindStone());
             }
@@ -30,9 +29,13 @@ namespace Legacy.Items
             {
                 GameSession.Hero.HeroInventory.Items.Add(new HealingPotion());
             }
-            else if (result >= 50)
+            else if (result <= 50)
             {
                 GameSession.Hero.Gold += result / 2;
+            }
+            else
+            {
+                GameSession.Hero.Gold += 10;
             }
 
             return true;
