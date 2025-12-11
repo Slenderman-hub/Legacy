@@ -4,6 +4,7 @@ using Legacy.Weapons;
 
 namespace Legacy
 {
+
     public class InventoryInterface
     {
         private readonly int WIDTH = Console.WindowWidth - (Console.WindowWidth / 9);
@@ -57,6 +58,7 @@ namespace Legacy
                     break;
             }
             FloorSession.DrawMap();
+            GameSession.Logger.DrawLoggerUI();
 
         }
         private void Open(Action drawSomething)
@@ -73,11 +75,11 @@ namespace Legacy
                 {
                     case ConsoleKey.Escape:
                         return;
-                    case ConsoleKey.J:
+                    case ConsoleKey.Y:
                         TabType = TabTypes.Bestiary;
                         Open(DrawBestiary);
                         return;
-                    case ConsoleKey.I:
+                    case ConsoleKey.T:
                         TabType = TabTypes.Items;
                         Open(DrawItems);
                         return;
@@ -150,9 +152,7 @@ namespace Legacy
                         Console.ForegroundColor = ConsoleColor.Black;
                     }
                     else
-                    {
                         Console.ResetColor();
-                    }
 
                     var item = Bestiary[itemIndex];
                     string mark = $"{{{i + 1}}}";
@@ -160,26 +160,19 @@ namespace Legacy
 
 
                     if (itemText.Length > highlightWidth)
-                    {
                         itemText = itemText.Substring(0, highlightWidth);
-                    }
 
 
                     Console.Write(itemText);
 
 
                     if (itemText.Length < highlightWidth)
-                    {
                         Console.Write(new string(' ', highlightWidth - itemText.Length));
-                    }
 
                     Console.ResetColor();
                 }
                 else
-                {
-
                     Console.Write(new string(' ', highlightWidth));
-                }
             }
 
 
@@ -203,63 +196,59 @@ namespace Legacy
                 // Имя 
                 string name = Bestiary[_selectedIndex].Name.ToUpper()+$" [{Bestiary[_selectedIndex].Icon}]";
                 int nameX = rightPanelStartX + (rightPanelWidth - name.Length) / 2;
-                Console.SetCursorPosition(nameX, HEIGHT / 12);
+                Console.SetCursorPosition(nameX, (HEIGHT / 6 - HEIGHT / 12));
                 Console.ForegroundColor = Bestiary[_selectedIndex].IconColor;
                 Console.Write(name);
 
-                //Здоровье
-                Console.SetCursorPosition(rightPanelStartX, HEIGHT / 6 + 2);
+                int descY = HEIGHT / 6 + 2;
+                Console.SetCursorPosition(rightPanelStartX, descY);
                 Console.ForegroundColor = ConsoleColor.Yellow;
+                string descr = $"[┼] {Bestiary[_selectedIndex].Description}";
+                List<string> descrLines = SplitMessage(descr, rightPanelWidth);
+                for (int j = 0; j < descrLines.Count; j++)
+                {
+                    Console.Write(descrLines[j]);
+                    Console.SetCursorPosition(rightPanelStartX, ++descY);
+                }
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                int specialY = descY + descrLines.Count + 2;
+                Console.SetCursorPosition(rightPanelStartX, specialY);
+                string special = $"{{!}} {Bestiary[_selectedIndex].Special}";
+                List<string> specialLines = SplitMessage(special, rightPanelWidth);
+                for (int j = 0; j < specialLines.Count; j++)
+                {
+                    Console.Write(specialLines[j]);
+                    Console.SetCursorPosition(rightPanelStartX, ++specialY);
+                }
+
+                Console.SetCursorPosition(rightPanelStartX, specialY + 2);
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 string healthText = $"{{+}} О.З: [{Bestiary[_selectedIndex].Health}]";
                 Console.Write(healthText);
 
-                // Урон
-                Console.SetCursorPosition(rightPanelStartX, HEIGHT / 6 + 4);
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.SetCursorPosition(rightPanelStartX, specialY + 4);
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
                 string damageText = $"{{!}} УРОН: [{Bestiary[_selectedIndex].Damage}]";
                 Console.Write(damageText);
 
-
-                //Тип врага
-                Console.SetCursorPosition(rightPanelStartX, HEIGHT / 6 + 6);
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.SetCursorPosition(rightPanelStartX, specialY + 6);
+                Console.ForegroundColor = ConsoleColor.Blue;
                 string typeText = $"{{?}} Тип: [{Bestiary[_selectedIndex].Type}]";
                 Console.Write(typeText);
-
-
-                // Описание
-                int descY = HEIGHT / 6 + 10;
-                Console.SetCursorPosition(rightPanelStartX, descY);
-                Console.ResetColor();
-                string descr = "ОПИСАНИЕ: " + Bestiary[_selectedIndex].Description;
-
-
-                int currentDescrLine = 0;
-                for (int j = 0; j < descr.Length; j++)
-                {
-                    Console.Write(descr[j]);
-                    if ((j + 1) % (rightPanelWidth) == 0)
-                    {
-                        currentDescrLine++;
-                        Console.SetCursorPosition(rightPanelStartX, descY + currentDescrLine);
-                    }
-                }
-
             }
 
-            // Подсказка в левом нижнем углу.
             Console.ResetColor();
             Console.SetCursorPosition(3, HEIGHT - 3);
             int curr = Bestiary.Count > 0 ? _selectedIndex + 1 : 0;
             Console.Write($"[{curr}/{Bestiary.Count}] │ [W/S] - Листать Вверх/Вниз │ [Enter] - Экипировать");
         }
-
         private void DrawItems()
         {
             TabType = TabTypes.Items;
             int highlightWidth = WIDTH / 2 - 2; 
 
-            //Список
+            
             for (int i = 0; i < _itemsPerPage; i++)
             {
                 int itemIndex = _scrollOffset + i;
@@ -276,9 +265,7 @@ namespace Legacy
                         Console.ForegroundColor = ConsoleColor.Black;
                     }
                     else
-                    {
                         Console.ResetColor();
-                    }
 
                     var item = Items[itemIndex];
                     string mark = GameSession.Hero.EquippedItem == item ? "(X)" : "( )";
@@ -286,26 +273,29 @@ namespace Legacy
 
                     
                     if (itemText.Length > highlightWidth)
-                    {
                         itemText = itemText.Substring(0, highlightWidth);
-                    }
 
-                    
-                    Console.Write(itemText);
 
-                    
-                    if (itemText.Length < highlightWidth)
+                    for (int k = 0; k < itemText.Length; k++)
                     {
-                        Console.Write(new string(' ', highlightWidth - itemText.Length));
+                        if (itemIndex != _selectedIndex)
+                        {
+                            if (k < 3)
+                                Console.ForegroundColor = ConsoleColor.White;
+                            else
+                                Console.ForegroundColor = item.InventoryColor;
+                        }
+                        Console.Write(itemText[k]);
                     }
+
+
+                    if (itemText.Length < highlightWidth)
+                        Console.Write(new string(' ', highlightWidth - itemText.Length));
 
                     Console.ResetColor();
                 }
                 else
-                {
-                    
                     Console.Write(new string(' ', highlightWidth));
-                }
             }
 
 
@@ -326,29 +316,33 @@ namespace Legacy
                     Console.Write(new string(' ', rightPanelWidth));
                 }
 
-                // Имя предмета 
                 string name = Items[_selectedIndex].Name.ToUpper();
                 int nameX = rightPanelStartX + (rightPanelWidth - name.Length) / 2;
-                Console.SetCursorPosition(nameX, HEIGHT / 12);
+                Console.SetCursorPosition(nameX, (HEIGHT / 6 - HEIGHT / 12));
                 Console.ForegroundColor = Items[_selectedIndex].InventoryColor;
                 Console.Write(name);
-
-                // Описание
-                int descY = HEIGHT / 6 + 4;
-                Console.SetCursorPosition(rightPanelStartX, descY);
                 Console.ResetColor();
-                string descr = "ОПИСАНИЕ: " + Items[_selectedIndex].Description;
 
-                
-                int currentDescrLine = 0;
-                for (int j = 0; j < descr.Length; j++)
+                int descY = HEIGHT / 6 + 2;
+                Console.SetCursorPosition(rightPanelStartX, descY);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                string descr = $"[┼] {Items[_selectedIndex].Description}";
+                List<string> descrLines = SplitMessage(descr, rightPanelWidth);
+                for (int j = 0; j < descrLines.Count; j++)
                 {
-                    Console.Write(descr[j]);
-                    if ((j + 1) % (rightPanelWidth) == 0)
-                    {
-                        currentDescrLine++;
-                        Console.SetCursorPosition(rightPanelStartX, descY + currentDescrLine);
-                    }
+                    Console.Write(descrLines[j]);
+                    Console.SetCursorPosition(rightPanelStartX, ++descY);
+                }
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                int specialY = descY + descrLines.Count + 2;
+                Console.SetCursorPosition(rightPanelStartX, specialY);
+                string special = $"{{!}} {Items[_selectedIndex].Special}";
+                List<string> specialLines = SplitMessage(special, rightPanelWidth);
+                for (int j = 0; j < specialLines.Count; j++)
+                {
+                    Console.Write(specialLines[j]);
+                    Console.SetCursorPosition(rightPanelStartX, ++specialY);
                 }
 
             }
@@ -359,12 +353,10 @@ namespace Legacy
             int curr = Items.Count > 0 ? _selectedIndex + 1 : 0;
             Console.Write($"[{curr}/{Items.Count}] │ [W/S] - Листать Вверх/Вниз │ [Enter] - Экипировать");
         }
-
         private void DrawWeapons()
         {
             TabType = TabTypes.Weapons;
 
-            
             int highlightWidth = WIDTH / 2 - 2; 
 
             for (int i = 0; i < _itemsPerPage; i++)
@@ -383,9 +375,7 @@ namespace Legacy
                         Console.ForegroundColor = ConsoleColor.Black;
                     }
                     else
-                    {
                         Console.ResetColor();
-                    }
 
                     var weapon = Weapons[itemIndex];
                     string mark = GameSession.Hero.EquippedWeapon == weapon ? "[X]" : "[ ]";
@@ -393,30 +383,31 @@ namespace Legacy
 
                     
                     if (itemText.Length > highlightWidth)
-                    {
                         itemText = itemText.Substring(0, highlightWidth);
-                    }
 
-                    
-                    Console.Write(itemText);
-
-                    
-                    if (itemText.Length < highlightWidth)
+                    for (int k = 0; k < itemText.Length; k++)
                     {
-                        Console.Write(new string(' ', highlightWidth - itemText.Length));
+                        if(itemIndex != _selectedIndex)
+                        {
+                            if (k < 3)
+                                Console.ForegroundColor = ConsoleColor.White;
+                            else
+                                Console.ForegroundColor = weapon.InventoryColor;
+                        }
+                        Console.Write(itemText[k]);
                     }
+
+                    if (itemText.Length < highlightWidth)
+                        Console.Write(new string(' ', highlightWidth - itemText.Length));
 
                     Console.ResetColor();
                 }
                 else
-                {
-                    
                     Console.Write(new string(' ', highlightWidth));
-                }
             }
 
             
-            // Правая панель с деталями предмета
+            
             if (_selectedIndex >= 0 && _selectedIndex < Weapons.Count)
             {
                 int rightPanelStartX = WIDTH / 2 + 1;
@@ -439,63 +430,48 @@ namespace Legacy
                 
                 string name = Weapons[_selectedIndex].Name.ToUpper();
                 int nameX = rightPanelStartX + (rightPanelWidth - name.Length) / 2;
-                Console.SetCursorPosition(nameX, HEIGHT / 12);
+                Console.SetCursorPosition(nameX, (HEIGHT / 6 - HEIGHT/12));
                 Console.ForegroundColor = Weapons[_selectedIndex].InventoryColor;
                 Console.Write(name);
+                Console.ResetColor();
 
-                
-                Console.SetCursorPosition(rightPanelStartX, HEIGHT / 6 + 2);
+                int descY = HEIGHT / 6 + 2;
+                Console.SetCursorPosition(rightPanelStartX, descY);
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                string damageText = $"УРОН: {Weapons[_selectedIndex].Damage}";
-                int damageX = rightPanelStartX + (rightPanelWidth - damageText.Length) / 2;
-                Console.SetCursorPosition(damageX, HEIGHT / 6 + 2);
+                string descr =  $"[┼] {Weapons[_selectedIndex].Description}";
+                List<string> descrLines = SplitMessage(descr, rightPanelWidth);
+                for (int j = 0; j < descrLines.Count; j++)
+                {
+                    Console.Write(descrLines[j]);
+                    Console.SetCursorPosition(rightPanelStartX, ++descY);
+                }
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                int specialY = descY + descrLines.Count + 2;
+                Console.SetCursorPosition(rightPanelStartX, specialY);
+                string special = $"{{!}} {Weapons[_selectedIndex].Special}";
+                List<string> specialLines = SplitMessage(special, rightPanelWidth);
+                for (int j = 0; j < specialLines.Count; j++)
+                {
+                    Console.Write(specialLines[j]);
+                    Console.SetCursorPosition(rightPanelStartX, ++specialY);
+                }
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                string damageText = $"{{^}} Урон: [{Weapons[_selectedIndex].Damage}]";
+                int damageX = rightPanelStartX;
+                Console.SetCursorPosition(damageX, specialY + 2);
                 Console.Write(damageText);
 
-                
-                int descY = HEIGHT / 6 + 4;
-                Console.SetCursorPosition(rightPanelStartX, descY);
-                Console.ResetColor();
-                string descr = "ОПИСАНИЕ: " + Weapons[_selectedIndex].Description;
-
-                
-                int currentDescrLine = 0;
-                for (int j = 0; j < descr.Length; j++)
-                {
-                    Console.Write(descr[j]);
-                    if ((j + 1) % (rightPanelWidth) == 0)
-                    {
-                        currentDescrLine++;
-                        Console.SetCursorPosition(rightPanelStartX, descY + currentDescrLine);
-                    }
-                }
-
-                
-                int specialY = descY + currentDescrLine + 2;
-                Console.SetCursorPosition(rightPanelStartX, specialY);
-                string special = $"[ОСОБЕННОСТЬ]: {Weapons[_selectedIndex].Special}";
-
-                
-                int currentSpecialLine = 0;
-                for (int j = 0; j < special.Length; j++)
-                {
-                    Console.Write(special[j]);
-                    if ((j + 1) % (rightPanelWidth) == 0)
-                    {
-                        currentSpecialLine++;
-                        Console.SetCursorPosition(rightPanelStartX, specialY + currentSpecialLine);
-                    }
-                }
             }
 
-            
             Console.ResetColor();
             Console.SetCursorPosition(3, HEIGHT - 3);
             Console.Write($"[{_selectedIndex + 1}/{Weapons.Count}] │ [W/S] - Листать Вверх/Вниз │ [Enter] - Экипировать");
         }
-
-
         private void DrawCore()
         {
+            Console.ForegroundColor = ConsoleColor.Magenta;
             for (int i = 3; i < HEIGHT; i++)
             {
                 Console.SetCursorPosition(0, i);
@@ -608,13 +584,13 @@ namespace Legacy
             else
                 Console.ForegroundColor = ConsoleColor.White;
             Console.SetCursorPosition(WIDTH / 4 + 1, 1);
-            Console.Write("ПРЕДМЕТЫ [I]".PadLeft(WIDTH / 7));
+            Console.Write("ПРЕДМЕТЫ [T]".PadLeft(WIDTH / 7));
             if (TabType == TabTypes.Bestiary)
                 Console.ForegroundColor = ConsoleColor.Yellow;
             else
                 Console.ForegroundColor = ConsoleColor.White;
             Console.SetCursorPosition(WIDTH / 2 + 1, 1);
-            Console.Write("БЕСТИАРИЙ [J]".PadLeft(2 * WIDTH / 14));
+            Console.Write("БЕСТИАРИЙ [Y]".PadLeft(2 * WIDTH / 14));
             if (TabType == TabTypes.Save)
                 Console.ForegroundColor = ConsoleColor.Yellow;
             else
@@ -623,6 +599,36 @@ namespace Legacy
             Console.Write("СОХРАНИТЬ И ВЫЙТИ [L]".PadLeft(3 * WIDTH / 24));
 
 
+        }
+        public static List<string> SplitMessage(string message, int maxWidth)
+        {
+            List<string> lines = new List<string>();
+
+            if (message.Length <= maxWidth)
+            {
+                lines.Add(message);
+                return lines;
+            }
+
+            int currentIndex = 0;
+            while (currentIndex < message.Length)
+            {
+                int length = Math.Min(maxWidth, message.Length - currentIndex);
+
+                if (currentIndex + length < message.Length)
+                {
+                    int lastSpace = message.LastIndexOf(' ', currentIndex + length - 1, length);
+                    if (lastSpace > currentIndex)
+                    {
+                        length = lastSpace - currentIndex + 1;
+                    }
+                }
+
+                lines.Add(message.Substring(currentIndex, length).TrimEnd());
+                currentIndex += length;
+            }
+
+            return lines;
         }
 
 

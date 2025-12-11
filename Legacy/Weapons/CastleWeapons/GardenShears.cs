@@ -14,7 +14,7 @@ namespace Legacy.Weapons.CastleWeapons
             Name = "Садовые ножницы";
             Damage = 2.8m;
             Description = "Не самая полезная вещь, что можно найти в этом замке. Но думаю, Искателям Растений оно понравится!";
-            Special = "За убийство врага, дает 10 золота. За убийства врага типа [Растение], дает 500 золота.";
+            Special = "За убийство врага, дает 10 золота. За убийства врага типа [Растение], дает [300] золота.";
             InventoryColor = ConsoleColor.Yellow;
         }
 
@@ -23,9 +23,11 @@ namespace Legacy.Weapons.CastleWeapons
             if(enemy.Health < 0)
             {
                 GameSession.Hero.Gold += 10;
-                if(enemy.Type == "Растение")
+                GameSession.Logger.Log($"Вы срезали [10] золотых", ConsoleColor.Yellow);
+                if (enemy.Type == "Растение")
                 {
-                    GameSession.Hero.Gold += 500;
+                    GameSession.Hero.Gold += 300;
+                    GameSession.Logger.Log($"Вы срезали [300] золотых",ConsoleColor.Yellow);
                 }
 
             }

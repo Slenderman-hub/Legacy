@@ -27,6 +27,7 @@ namespace Legacy.Weapons.OtherWeapons
                     {
                         Damage++;
                         _currentStack.Add(item.Key);
+                        GameSession.Logger.Log($"Страницу [{item.Key}] настигает забвение", ConsoleColor.DarkMagenta);
                         GameSession.Hero.HeroInventory.Bestiary.Creatures.Remove(item.Key);
                         break;
 

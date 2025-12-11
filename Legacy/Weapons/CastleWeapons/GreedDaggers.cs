@@ -24,6 +24,7 @@ namespace Legacy.Weapons.CastleWeapons
             hero.Gold += (int)Damage * 20;
             hero.Health -= Damage;
             Damage++;
+            GameSession.Logger.Log($"Ваша жадность растёт...",ConsoleColor.DarkYellow);
         }
 
     }

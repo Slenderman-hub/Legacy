@@ -1,4 +1,5 @@
 ﻿using Legacy.Enemies;
+using Legacy.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace Legacy.Weapons.OtherWeapons
         {
             if (hero.Health == hero.MaxHealth)
             {
+                GameSession.Logger.Log($"Стойкость сердца наполяет вашу десницу",ConsoleColor.DarkYellow);
                 hero.HeroInventory.Weapons.Remove(this);
                 hero.HeroInventory.Weapons.Add(_lastState);
                 hero.EquippedWeapon = _lastState;
@@ -41,7 +43,7 @@ namespace Legacy.Weapons.OtherWeapons
         {
             Name = "Экскалибур";
             Damage = 10;
-            Description = "Давным-давно, один Искатель Смерти, смог вытащить камень из меча, или наоборот? Никто не помнит! Но, это проклятое место, помнит всё...";
+            Description = "Давным-давно, один принц, не смог вытащить меч из камня, или наоборот? Никто не помнит! Но, это проклятое место, помнит всё...";
             Special = "Когда ваше  здоровье соотвествует максимальному, Экскалибур сохраняет свою форму";
             InventoryColor = ConsoleColor.Magenta;
         }

@@ -20,11 +20,11 @@ namespace Legacy
 
             switch (GameSession.Location)
             {
-                case GameSession.Locations.Castle:
+                case Locations.Castle:
                     var castleGen = new CastleGen();
                     castleGen.GenerateLocation();
                     break;
-                case GameSession.Locations.Forest:
+                case Locations.Forest:
                     break;
                 default:
                     break;

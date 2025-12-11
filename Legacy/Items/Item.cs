@@ -7,7 +7,10 @@ namespace Legacy.Items
     {
         public string Name { get; protected set; } = string.Empty;
         public string Description { get; protected set; } = string.Empty;
+        public string Special { get; protected set; } = string.Empty;
         public ConsoleColor InventoryColor { get; protected set; } = ConsoleColor.White;
+
+        
         public virtual void Consume()
         {
             GameSession.Hero.EquippedItem = null;

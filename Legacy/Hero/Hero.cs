@@ -11,10 +11,14 @@ namespace Legacy
     {
         public int Gold { get; set; } = 0;
         public Inventory HeroInventory = new Inventory();
-        public int Stagger = 0;
         public Weapon EquippedWeapon;
         public Item EquippedItem = null;
+
+
         
+        
+        public int Stagger = 0;
+        public int StaggerImmune = 0;
 
         public decimal Health { get; set; } = 30;
         public decimal MaxHealth = 30;
@@ -44,40 +48,51 @@ namespace Legacy
                     passiveCast.PassiveCast(this);
                 }
             }
-            if (Stagger > 0)
+
+
+            if(Stagger > 0)
             {
-                Stagger--;
+                StaggerImmune++;
+                Stagger -= StaggerImmune;
                 return;
             }
-
-            switch (action)
+            else
             {
-                case Actions.Up:
-                    if (Pos.y - 1 >= 1)
-                        HandleNextTile(Pos.x, Pos.y - 1);
-                    break;
-                case Actions.Down:
-                    if (Pos.y + 1 < MAP_HEIGHT - 1)
-                        HandleNextTile(Pos.x, Pos.y + 1);
-                    break;
-                case Actions.Left:
-                    if (Pos.x - 1 >= 1)
-                        HandleNextTile(Pos.x - 1, Pos.y);
-                    break;
-                case Actions.Right:
-                    if (Pos.x + 1 < MAP_WIDTH)
-                        HandleNextTile(Pos.x + 1, Pos.y);
-                    break;
-                case Actions.Swap:
-                    SwapNextTile();
-                    break;
-                case Actions.Use:
-                    ManageItem();
-                    break;
-                default:
-                    break;
+                if(StaggerImmune > 0)
+                {
+                    StaggerImmune--;
+                }
             }
+
+                switch (action)
+                {
+                    case Actions.Up:
+                        if (Pos.y - 1 >= 1)
+                            HandleNextTile(Pos.x, Pos.y - 1);
+                        break;
+                    case Actions.Down:
+                        if (Pos.y + 1 < MAP_HEIGHT - 1)
+                            HandleNextTile(Pos.x, Pos.y + 1);
+                        break;
+                    case Actions.Left:
+                        if (Pos.x - 1 >= 1)
+                            HandleNextTile(Pos.x - 1, Pos.y);
+                        break;
+                    case Actions.Right:
+                        if (Pos.x + 1 < MAP_WIDTH)
+                            HandleNextTile(Pos.x + 1, Pos.y);
+                        break;
+                    case Actions.Swap:
+                        SwapNextTile();
+                        break;
+                    case Actions.Use:
+                        ManageItem();
+                        break;
+                    default:
+                        break;
+                }
         }
+
         private void ManageItem()
         {
             if (EquippedItem is null)
@@ -112,7 +127,7 @@ namespace Legacy
             if (nextEntity is null)
             {
                 WriteNewPosition(Icon, Pos, IconColor);
-            return;
+                return;
 
             }
             SwapPosition(nextEntity, this);
@@ -145,8 +160,7 @@ namespace Legacy
                         return (Pos.x + 1, Pos.y);
                     break;
                 default:
-                    GetNextTile();
-                    break;
+                    return GetNextTile();
                 
             }
             return (0, 0);
@@ -169,6 +183,7 @@ namespace Legacy
                     Weapon weapon = (Weapon)Entities.FirstOrDefault(w => w.Pos == next);
                     HeroInventory.Weapons.Add(weapon);
                     EquippedWeapon = HeroInventory.Weapons.Last();
+                    GameSession.Logger.Log($"Вы находите оружие [{weapon.Name}]");
                     WriteNewPosition(' ', next);
                     Entities.Remove(weapon);
                     break;
@@ -199,7 +214,8 @@ namespace Legacy
             if (EquippedWeapon is IPreSpecial preCast)
                 preCast.PreCast(this, enemy);
             enemy.Health -= EquippedWeapon.Damage;
-            
+
+            GameSession.Logger.Log($"Вы атакуете [{enemy.Name}], нанося [{EquippedWeapon.Damage}] урона");
             enemy.Stagger += 1;
             if(enemy.Health <= 0)
             {

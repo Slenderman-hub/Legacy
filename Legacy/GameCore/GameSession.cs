@@ -1,7 +1,4 @@
 ﻿
-
-using System;
-
 namespace Legacy
 {
     public class MapEntity
@@ -10,10 +7,29 @@ namespace Legacy
         public (int x, int y) Pos { get; set; }
         public ConsoleColor IconColor { get; set; }
     }
+    public enum Actions
+    {
+        Up = 1,
+        Down,
+        Left,
+        Right,
+        Nothing,
+        Swap,
+        Inventory,
+        Use,
+        Exit,
+    }
+    public enum Locations
+    {
+        Castle,
+        Forest
+    }
 
     public static class GameSession
     {
         public static InventoryInterface InvInterface { get; private set; }
+        public static EventLogger Logger { get; private set; }
+
         public const int MAP_WIDTH = 100; 
         public const int MAP_HEIGHT = 50;
         public static readonly int CenterIndent = (int)(Console.WindowWidth / 2.95);
@@ -24,27 +40,14 @@ namespace Legacy
         public static Locations Location = Locations.Castle;
 
         //public static char[,] Map;
-        public enum Actions
-        {
-            Up = 1,
-            Down,
-            Left,
-            Right,
-            Swap,
-            Inventory,
-            Use,
-            Exit,
-        }
-        public enum Locations
-        {
-            Castle,
-            Forest
-        }
+
 
         public static bool StartSession()
         {
             Console.CursorVisible = false;
             InvInterface = new InventoryInterface();
+            Logger = new EventLogger();
+
             GameIsRunning = true;
             while (GameIsRunning)
             {

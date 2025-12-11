@@ -19,9 +19,15 @@ namespace Legacy
         public bool StartFloor()
         {
             FloorIsRunning = true;
+
             Legacy.MapWriter.GenerateMap();
             DrawMap();
-            
+
+            StatUI.DrawStatUI();
+
+            GameSession.Logger.Clear();
+            GameSession.Logger.DrawLoggerUI();
+
             MusicPlayer.Play();
             
             
@@ -34,12 +40,12 @@ namespace Legacy
                     }
                     else
                         return false;
-
                 }
                 Thread.Sleep(10);
                 HeroMove();
                 EnemiesMove();
                 StatUI.DrawStatUI();
+                
 
             }
             GameSession.Hero.HeroInventory.Bestiary.Save();
@@ -80,7 +86,7 @@ namespace Legacy
                 foreach (var entity in Entities)
                 {
                     if(entity is Enemy enemy)
-                        enemy.Action((GameSession.Actions)Random.Shared.Next(1, 5));
+                        enemy.Action((Actions)Random.Shared.Next(1, 5));
                 }
         }
 
@@ -96,31 +102,31 @@ namespace Legacy
             switch (userInput)
             {
                 case ConsoleKey.W:
-                    GameSession.Hero.Action(GameSession.Actions.Up);
+                    GameSession.Hero.Action(Actions.Up);
                     break;
                 case ConsoleKey.S:
-                    GameSession.Hero.Action(GameSession.Actions.Down);
+                    GameSession.Hero.Action(Actions.Down);
                     break;
                 case ConsoleKey.A:
-                    GameSession.Hero.Action(GameSession.Actions.Left);
+                    GameSession.Hero.Action(Actions.Left);
                     break;
                 case ConsoleKey.D:
-                    GameSession.Hero.Action(GameSession.Actions.Right);
+                    GameSession.Hero.Action(Actions.Right);
                     break;
                 case ConsoleKey.R:
                     GameSession.InvInterface.OpenInterface(InventoryInterface.TabTypes.Weapons);
                     break;
-                case ConsoleKey.J:
+                case ConsoleKey.Y:
                     GameSession.InvInterface.OpenInterface(InventoryInterface.TabTypes.Bestiary);
                     break;
-                case ConsoleKey.I:
+                case ConsoleKey.T:
                     GameSession.InvInterface.OpenInterface(InventoryInterface.TabTypes.Items);
                     break;
                 case ConsoleKey.Spacebar:
-                    GameSession.Hero.Action(GameSession.Actions.Swap);
+                    GameSession.Hero.Action(Actions.Swap);
                     break;
                 case ConsoleKey.E:
-                    GameSession.Hero.Action(GameSession.Actions.Use);
+                    GameSession.Hero.Action(Actions.Use);
                     break;
                 default:
                     break;
@@ -139,16 +145,28 @@ namespace Legacy
                 {
                     if (MapWriter.WallIcons.Contains(Map[i, j]))
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                    if (Map[i, j] == '&')
-                        Console.ForegroundColor = ConsoleColor.Red;
-                    if (Map[i,j] == '!')
-                        Console.ForegroundColor = ConsoleColor.Magenta;
-                    if (Map[i, j] == '#')
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                    if (Map[i, j] == '@')
-                        Console.ForegroundColor = ConsoleColor.Blue;
+                    else
+                    {
+                        MapEntity entity = Entities.FirstOrDefault(e => e.Pos == (j, i));
+                        if (entity != null)
+                            Console.ForegroundColor = entity.IconColor;
+                        else
+                            Console.ForegroundColor = ConsoleColor.Red;
+                    }
 
-                    Console.BackgroundColor = ConsoleColor.Black;
+
+                    //if (MapWriter.WallIcons.Contains(Map[i, j]))
+                    //    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    //if (Map[i, j] == '&')
+                    //    Console.ForegroundColor = ConsoleColor.Red;
+                    //if (Map[i,j] == '!')
+                    //    Console.ForegroundColor = ConsoleColor.Magenta;
+                    //if (Map[i, j] == '#')
+                    //    Console.ForegroundColor = ConsoleColor.Yellow;
+                    //if (Map[i, j] == '@')
+                    //    Console.ForegroundColor = ConsoleColor.Blue;
+
+                    //Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(Map[i, j]);
                     Console.ResetColor();
 

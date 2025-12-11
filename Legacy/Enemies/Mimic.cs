@@ -1,4 +1,5 @@
 ﻿using Legacy.Weapons.OtherWeapons;
+using System;
 
 namespace Legacy.Enemies
 {
@@ -19,6 +20,7 @@ namespace Legacy.Enemies
             if (hero.EquippedWeapon is not Fist)
             {
                 this.LootWeapons.Add(hero.EquippedWeapon);
+                GameSession.Logger.Log($"Ваша десница больше не чувствует [{hero.EquippedWeapon}] ",ConsoleColor.Red);
                 hero.HeroInventory.Weapons.Remove(hero.EquippedWeapon);
                 hero.EquippedWeapon = hero.HeroInventory.Weapons[0];
 

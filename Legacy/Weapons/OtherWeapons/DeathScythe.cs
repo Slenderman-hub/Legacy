@@ -1,4 +1,5 @@
 ﻿using Legacy.Enemies;
+using Legacy.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,7 @@ namespace Legacy.Weapons.OtherWeapons
             if (!_buff)
             {
                 _buff = true;
+                GameSession.Logger.Log($"Вы чувствуете {{её}} присутствие...", ConsoleColor.DarkMagenta);
             }
             
         }

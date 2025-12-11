@@ -23,6 +23,7 @@ namespace Legacy.Weapons.OtherWeapons
             if (curentLevel != GameSession.Level)
             {
                 Damage++;
+                GameSession.Logger.Log($"Вашу душу наполняет героизм",ConsoleColor.Cyan);
                 curentLevel = GameSession.Level;
 
             }

@@ -27,7 +27,9 @@ namespace Legacy.Weapons.OtherWeapons
             {
                 healingEffect = enemy.Health,
                 enemyName = enemy.Name
+
             });
+            GameSession.Logger.Log($"Душа существа [{enemy.Name}] , ныне ему не служит",ConsoleColor.DarkCyan);
         }
     }
 }

@@ -8,18 +8,19 @@ namespace Legacy.Enemies.CastleEnemies
 {
     public class Rogue : Enemy
     {
+        int gold = 10;
         public Rogue(int x, int y) : base(x, y)
         {
             Icon = 'R';
             Name = "Плут";
-            Description = "Ранее желающий поживиться наследием Лича, пройдоха-плут, ныне скованный проклятием, Страж его владений. Вдвойне быстр в своих действиях, но тем не менее силенок пережить больше двух ударов, у него врятли найдется. При каждом ударе, выбивает из вас 10 золота, чтобы покрыть свой микрозайм";
+            Description = $"Ранее желающий поживиться наследием Лича, пройдоха-плут, ныне скованный проклятием - страж его владений. Вдвойне быстр в своих действиях, но тем не менее силенок пережить больше двух ударов, у него врятли найдется. При каждом ударе, выбивает из вас [{gold}] золота, чтобы покрыть свой микрозайм";
             Type = "Нежить";
             Health = 1;
             Damage = 4;
             Stagger = 0;
             IconColor = ConsoleColor.DarkYellow;
         }
-        public override void Action(GameSession.Actions action)
+        public override void Action(Actions action)
         {
             base.Action(action);
             base.Action(action);
@@ -27,7 +28,8 @@ namespace Legacy.Enemies.CastleEnemies
         public override void Attack(Hero hero)
         {
             base.Attack(hero);
-            hero.Gold -= 10;
+            hero.Gold -= gold;
+            GameSession.Logger.Log($"Ваш кошель немного пустеет",ConsoleColor.Red);
             if (hero.Gold < 0)
                 hero.Gold = 0;
         }
@@ -35,7 +37,10 @@ namespace Legacy.Enemies.CastleEnemies
         {
             base.OnDeath();
             if (Random.Shared.Next(2) == 0)
-                GameSession.Hero.Gold += 20;
+            {
+                GameSession.Hero.Gold += gold;
+                GameSession.Logger.Log($"Ваш кошель пополнился на [{gold}] золотых",ConsoleColor.Yellow);
+            }
 
         }
     }

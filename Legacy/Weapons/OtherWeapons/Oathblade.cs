@@ -23,10 +23,12 @@ namespace Legacy.Weapons.OtherWeapons
             if(result == 0)
             {
                 hero.MaxHealth += 5;
+                GameSession.Logger.Log($"Судьба на вашей стороне",ConsoleColor.Magenta);
             }
             else
             {
                 hero.Health -= 5;
+                GameSession.Logger.Log($"Судьба отвернулась от вас", ConsoleColor.DarkMagenta);
             }
 
         }

@@ -30,6 +30,7 @@ namespace Legacy.Weapons.OtherWeapons
                     if (buffedWeapon == null)
                         return;
                     buffedWeapon.Damage -= buffedWeapon.Damage / 2;
+                    GameSession.Logger.Log($"Решимость [{buffedWeapon.Name}] меркнет",ConsoleColor.Gray);
                     buffedWeapon = null;
                     _buff = false;
                 }
@@ -46,6 +47,7 @@ namespace Legacy.Weapons.OtherWeapons
                 _buff = true;
                 buffedWeapon = hero.HeroInventory.Weapons[Random.Shared.Next(0, hero.HeroInventory.Weapons.Count)];
                 buffedWeapon.Damage += buffedWeapon.Damage ;
+                GameSession.Logger.Log($"[{buffedWeapon.Name}] изливается решимостью",ConsoleColor.DarkMagenta);
             }
             hero.Stagger += 8;
             FloorSession.WriteNewPosition(hero.Icon, hero.Pos, ConsoleColor.Cyan);

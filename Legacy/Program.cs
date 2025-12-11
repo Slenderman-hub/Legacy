@@ -1,4 +1,5 @@
 ﻿using Legacy;
+
 class Program
 {
     static void Main()

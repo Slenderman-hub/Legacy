@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EntityStates\**" />
+    <EmbeddedResource Remove="EntityStates\**" />
+    <None Remove="EntityStates\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Music\Floor1.mp3" />
     <None Remove="Music\Floor2.mp3" />
     <None Remove="Music\Floor3.mp3" />
@@ -28,10 +34,6 @@
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="System.Windows.Extensions" Version="10.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="EntityStates\" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using Legacy.Enemies;
+using Legacy.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace Legacy.Weapons
             {
                 Damage *= 3;
                 buff = true;
+                GameSession.Logger.Log($"Вашу десницу наполняет сила",ConsoleColor.Cyan);
             }
                 
         }

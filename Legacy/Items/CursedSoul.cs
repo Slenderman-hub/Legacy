@@ -23,9 +23,16 @@ namespace Legacy.Items
             base.UseOnEnemy(enemy);
             int result = Random.Shared.Next(0, 10);
             if (result == 9)
+            {
                 enemy.Health -= enemy.Health / 2;
+                GameSession.Logger.Log($"Душа [{enemy.Name}] раскололась",ConsoleColor.DarkCyan);
+            }
             else
+            {
                 enemy.Health += healingEffect;
+                GameSession.Logger.Log($"Душа [{enemy.Name}] наполнилась жизненной силой", ConsoleColor.DarkCyan);
+            }
+                
         }
 
         public override void UseOnHero(Hero hero)
@@ -37,12 +44,14 @@ namespace Legacy.Items
                 hero.MaxHealth = hero.MaxHealth / 2;
                 if (hero.Health > hero.MaxHealth)
                     hero.Health = hero.MaxHealth;
+                GameSession.Logger.Log($"Вы чувствуете треск в глубине души", ConsoleColor.DarkCyan);
             }
             else
             {
                 hero.Health += healingEffect;
                 if (hero.Health > hero.MaxHealth)
                     hero.Health = hero.MaxHealth;
+                GameSession.Logger.Log($"Вы чувствуете себя лучше", ConsoleColor.Cyan);
             }
         }
     }

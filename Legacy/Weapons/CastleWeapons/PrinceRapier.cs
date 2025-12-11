@@ -35,6 +35,7 @@ namespace Legacy.Weapons.CastleWeapons
             {
                 Name = "Рапира Принца [Благословена]";
                 InventoryColor = ConsoleColor.DarkYellow;
+                GameSession.Logger.Log($"Ваша душа чувствует королевские корни");
                 trigger = true;
             }
         }
@@ -50,7 +51,7 @@ namespace Legacy.Weapons.CastleWeapons
                     Damage = 5.5m;
                     Name = "Рапира Принца [Проклята]";
                     InventoryColor = ConsoleColor.DarkGray;
-                    Description = "Ты не можешь обманывать {её} вечно, точнее ты можешь, но как скоро {ей} надоест?";
+                    Description = "Ты не можешь обманывать {её} вечно";
                     Special = "Неплохой урон";
                     
                     buff = false;

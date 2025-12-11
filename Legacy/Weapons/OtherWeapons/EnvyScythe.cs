@@ -32,6 +32,7 @@ namespace Legacy.Weapons.OtherWeapons
                         hero.Health = hero.MaxHealth;
                     Name = $"Коса Зависти [{enemy.Name}]";
                     cooldown++;
+                    GameSession.Logger.Log($"Вы забываете себя...",ConsoleColor.DarkMagenta);
                 }
                 else
                 {

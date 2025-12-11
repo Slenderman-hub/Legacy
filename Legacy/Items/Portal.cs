@@ -4,14 +4,14 @@ namespace Legacy.Items
 {
     public class Portal : MapEntity
     {
-        public GameSession.Locations Location;
+        public Locations Location;
         public int Level;
-        public Portal(GameSession.Locations location, int level)
+        public Portal(Locations location, int level)
         {
             Icon = '@';
             Location = location;
             Level = level;
-            IconColor = ConsoleColor.Cyan;
+            IconColor = ConsoleColor.Blue;
         }
 
         public void Teleport()

@@ -8,7 +8,7 @@ namespace Legacy
 {
     public static class StatUI
     {
-        private const int HEIGHT = 11;
+        public const int HEIGHT = 30;
         private static string LocationName = "";
         public static void DrawStatUI()
         {
@@ -92,7 +92,7 @@ namespace Legacy
             }
             for (int i = 0; i < GameSession.CenterIndent - 5; i++)
             {
-                Console.SetCursorPosition(i, GameSession.MAP_HEIGHT / 4 * 3);
+                Console.SetCursorPosition(i, HEIGHT);
                 if (i == 0)
                     Console.Write("└");
                 else if (i == GameSession.CenterIndent - 6)
@@ -103,7 +103,7 @@ namespace Legacy
             string guideBanner = " [?        ?]";
             for (int i = 1; i < GameSession.CenterIndent - 6; i++)
             {
-                Console.SetCursorPosition(i, 18);
+                Console.SetCursorPosition(i, 16);
                 if (i == (GameSession.CenterIndent / 2 - guideBanner.Length + 2))
                 {
                     Console.Write(guideBanner);
@@ -115,14 +115,22 @@ namespace Legacy
                     Console.Write('-');
                 }
             }
+            Console.SetCursorPosition(1, 18);
+            Console.Write("* [W/A/S/D] - Перемещение | [Пробел] - Свап");
             Console.SetCursorPosition(1, 20);
-            Console.Write("* [W/A/S/D] - Перемещение");
+            Console.Write("* [R] - Открыть инвентарь");
             Console.SetCursorPosition(1, 22);
-            Console.Write("* [Пробел] - Свап");
-            Console.SetCursorPosition(1, 24);
-            Console.Write("* [I] - Открыть инвентарь");
-            Console.SetCursorPosition(1, 26);
             Console.Write("* [E] - Использовать предмет");
+            Console.SetCursorPosition(1, 24);
+            Console.Write("{ @ } - Портал");
+            Console.SetCursorPosition(1, 25);
+            Console.Write("{ ! } - Оружие");
+            Console.SetCursorPosition(1, 26);
+            Console.Write("{ # } - Сундук");
+            Console.SetCursorPosition(1, 27);
+            Console.Write("{ K } - Существо");
+            Console.SetCursorPosition(1, 28);
+            Console.Write("{ ? }");
 
 
             Console.SetCursorPosition(nameStart, 0);
@@ -130,7 +138,7 @@ namespace Legacy
             Console.Write(LocationName.ToUpper());
             Console.ResetColor();
 
-            for (int i = 1; i < GameSession.MAP_HEIGHT/4 * 3; i++)
+            for (int i = 1; i < HEIGHT; i++)
             {
                 Console.SetCursorPosition(0, i);
                 Console.Write("│");
